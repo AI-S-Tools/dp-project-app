@@ -82,24 +82,31 @@ func showWikiTopics() {
 
 📁 Project Management:
   • "create project" - Complete project creation guide
+  • "project types" - Phase-based vs Task-based projects
   • "project structure" - Directory organization
   • "project workflow" - End-to-end project management
+  • "build project" - Complete project building workflow
 
 📋 Phase Management:
   • "create phase" - Phase creation and organization
   • "phase workflow" - Managing development phases
   • "phase structure" - Phase directory layout
+  • "active phases" - List and monitor active phases
 
 ✅ Task Management:
   • "create task" - Task creation with all options
   • "task dependencies" - Dependency management
   • "task workflow" - Task lifecycle management
   • "task components" - Breaking tasks into components
+  • "active tasks" - List all active/in-progress tasks
+  • "dependency order" - View tasks in dependency order
 
 📊 Status & Reporting:
   • "status commands" - All status reporting options
   • "dependency chains" - Understanding task relationships
   • "blocked tasks" - Identifying and resolving blocks
+  • "find task" - Search for specific tasks
+  • "list active" - Show all active work items
 
 🔧 Advanced Features:
   • "time tracking" - Time logging and estimation
@@ -108,13 +115,16 @@ func showWikiTopics() {
 
 🚀 Complete Workflows:
   • "complete" - Full project creation to completion example
-  • "real world" - Practical usage scenarios`)
+  • "real world" - Practical usage scenarios
+  • "ai workflow" - AI-optimized project workflow`)
 }
 
 func searchWiki(searchTerm string) {
 	switch {
 	case strings.Contains(searchTerm, "create project") || strings.Contains(searchTerm, "project creation"):
 		showProjectCreationGuide()
+	case strings.Contains(searchTerm, "project types") || strings.Contains(searchTerm, "phase-based") || strings.Contains(searchTerm, "task-based"):
+		showProjectTypesGuide()
 	case strings.Contains(searchTerm, "create phase") || strings.Contains(searchTerm, "phase creation"):
 		showPhaseCreationGuide()
 	case strings.Contains(searchTerm, "create task") || strings.Contains(searchTerm, "task creation"):
@@ -129,12 +139,26 @@ func searchWiki(searchTerm string) {
 		showStructureGuide()
 	case strings.Contains(searchTerm, "workflow") || strings.Contains(searchTerm, "process"):
 		showWorkflowGuide()
+	case strings.Contains(searchTerm, "active tasks") || strings.Contains(searchTerm, "in progress"):
+		showActiveTasksGuide()
+	case strings.Contains(searchTerm, "active phases") || strings.Contains(searchTerm, "current phases"):
+		showActivePhasesGuide()
+	case strings.Contains(searchTerm, "dependency order") || strings.Contains(searchTerm, "task order"):
+		showDependencyOrderGuide()
+	case strings.Contains(searchTerm, "build project") || strings.Contains(searchTerm, "project building"):
+		showProjectBuildingGuide()
+	case strings.Contains(searchTerm, "list active") || strings.Contains(searchTerm, "active work"):
+		showListActiveGuide()
+	case strings.Contains(searchTerm, "find task") || strings.Contains(searchTerm, "search task"):
+		showFindTaskGuide()
+	case strings.Contains(searchTerm, "ai workflow") || strings.Contains(searchTerm, "ai project"):
+		showAIWorkflowGuide()
 	default:
 		fmt.Printf("No specific guide found for '%s'\n\n", searchTerm)
 		fmt.Println("Try one of these common searches:")
-		fmt.Println("  dppm wiki \"create project\"")
-		fmt.Println("  dppm wiki \"dependencies\"")
-		fmt.Println("  dppm wiki \"status commands\"")
+		fmt.Println("  dppm wiki \"project types\"")
+		fmt.Println("  dppm wiki \"active tasks\"")
+		fmt.Println("  dppm wiki \"dependency order\"")
 		fmt.Println("  dppm wiki list")
 	}
 }
@@ -725,6 +749,703 @@ Let's walk through creating a complete project from scratch.
 
 This example shows how DPPM manages complex projects with proper dependencies,
 phase organization, and clear workflow progression!`)
+}
+
+func showProjectTypesGuide() {
+	fmt.Println(`Project Types Guide
+==================
+
+DPPM supports two project organization strategies:
+
+🗂️ PHASE-BASED PROJECTS (Recommended)
+Best for: Larger projects with distinct development stages
+
+Structure:
+  project/
+  └── phases/
+      ├── phase-1/
+      │   └── tasks/
+      ├── phase-2/
+      │   └── tasks/
+      └── phase-3/
+          └── tasks/
+
+Benefits:
+  ✅ Clear separation of development stages
+  ✅ Better overview of project progress
+  ✅ Easier to manage large numbers of tasks
+  ✅ Natural grouping of related work
+
+Example:
+  dppm project create web-app --name "Web Application"
+  dppm phase create backend --project web-app
+  dppm phase create frontend --project web-app
+  dppm task create api --project web-app --phase backend
+  dppm task create ui --project web-app --phase frontend
+
+📋 TASK-BASED PROJECTS (Simple)
+Best for: Small projects with few tasks
+
+Structure:
+  project/
+  └── tasks/
+      ├── task-1.yaml
+      ├── task-2.yaml
+      └── task-3.yaml
+
+Benefits:
+  ✅ Simple and flat structure
+  ✅ Quick to set up
+  ✅ Good for maintenance tasks
+
+Example:
+  dppm project create bugfixes --name "Bug Fixes"
+  dppm task create fix-login --project bugfixes --title "Fix login bug"
+  dppm task create fix-api --project bugfixes --title "Fix API error"
+
+💡 CHOOSING THE RIGHT TYPE:
+Use Phase-Based When:
+  • Project has > 10 tasks
+  • Clear development stages exist
+  • Multiple people working
+  • Long-term project
+
+Use Task-Based When:
+  • Project has < 10 tasks
+  • Simple maintenance work
+  • Quick fixes needed
+  • Personal todo list
+
+🔍 Related Commands:
+  • dppm wiki "create phase"      # Phase management
+  • dppm wiki "project workflow"  # Complete examples`)
+}
+
+func showActiveTasksGuide() {
+	fmt.Println(`Active Tasks Guide
+=================
+
+📋 FINDING ALL ACTIVE TASKS:
+
+List all in-progress tasks across all projects:
+  dppm status active
+
+List active tasks in specific project:
+  dppm status active --project web-app
+
+List tasks by status:
+  dppm list tasks --project web-app --status in_progress
+  dppm list tasks --project web-app --status todo
+
+📊 Example Output:
+  Active Tasks (In Progress):
+  ==========================
+
+  Project: web-app
+  • Authentication API (high priority)
+    Phase: backend
+    Assignee: john-doe
+    Started: 2025-09-23
+
+  • User Interface (medium priority)
+    Phase: frontend
+    Assignee: jane-smith
+    Started: 2025-09-24
+
+💡 MONITORING ACTIVE WORK:
+
+Check who's working on what:
+  dppm list tasks --assignee john-doe --status in_progress
+
+Check phase progress:
+  dppm list tasks --phase backend --status in_progress
+
+Find overdue active tasks:
+  dppm list tasks --status in_progress --overdue
+
+🔧 UPDATING TASK STATUS:
+
+Mark task as in progress:
+  dppm task update AUTH-001 --status in_progress
+
+Mark task as completed:
+  dppm task update AUTH-001 --status done
+
+⚠️ BEST PRACTICES:
+  • Only have 1-2 tasks in_progress per person
+  • Update status immediately when starting/stopping work
+  • Review active tasks daily
+  • Complete tasks before starting new ones
+
+🔍 Related Commands:
+  • dppm wiki "status commands"   # All status options
+  • dppm wiki "task workflow"     # Task lifecycle`)
+}
+
+func showActivePhasesGuide() {
+	fmt.Println(`Active Phases Guide
+==================
+
+📅 UNDERSTANDING PHASE STATUS:
+
+Phase Status Values:
+  • planning   - Phase being designed
+  • active     - Currently working on this phase
+  • completed  - Phase finished
+  • cancelled  - Phase abandoned
+
+📋 FINDING ACTIVE PHASES:
+
+List all phases in a project:
+  dppm list phases --project web-app
+
+List only active phases:
+  dppm list phases --project web-app --status active
+
+Check phase details:
+  dppm phase show backend --project web-app
+
+📊 Example Phase Listing:
+  Phases for project: web-app
+  ==========================
+
+  ✅ Phase: setup (completed)
+     Tasks: 3/3 completed
+     Duration: 2025-09-01 to 2025-09-07
+
+  🔄 Phase: backend (active)
+     Tasks: 5/8 completed, 2 in progress, 1 blocked
+     Duration: 2025-09-08 to 2025-09-22
+
+  📋 Phase: frontend (planning)
+     Tasks: 0/5 completed
+     Duration: 2025-09-23 to 2025-10-07
+
+🔧 MANAGING PHASE TRANSITIONS:
+
+Activate a phase:
+  dppm phase update backend --project web-app --status active
+
+Complete a phase:
+  dppm phase update backend --project web-app --status completed
+
+💡 PHASE WORKFLOW:
+  1. Create phase in "planning" status
+  2. Add all tasks to the phase
+  3. Set phase to "active" when ready to start
+  4. Work through tasks in dependency order
+  5. Mark phase "completed" when all tasks done
+
+⚠️ BEST PRACTICES:
+  • Only one phase should be "active" at a time
+  • Complete phases before starting new ones
+  • Use phases to group related work
+  • Plan all phases at project start
+
+🔍 Related Commands:
+  • dppm wiki "create phase"      # Phase creation
+  • dppm wiki "phase workflow"    # Phase management`)
+}
+
+func showDependencyOrderGuide() {
+	fmt.Println(`Dependency Order Guide
+=====================
+
+🔗 UNDERSTANDING DEPENDENCY ORDER:
+
+Tasks must be completed in dependency order:
+  1. Tasks with no dependencies (can start immediately)
+  2. Tasks depending only on completed tasks
+  3. Tasks with unmet dependencies (blocked)
+
+📋 VIEWING DEPENDENCY ORDER:
+
+Show dependency chain for project:
+  dppm status dependencies --project web-app
+
+Show tasks in workable order:
+  dppm status project web-app
+  # Shows: Ready tasks → Blocked tasks
+
+📊 Example Dependency Chain:
+  Dependency Order for web-app:
+  ============================
+
+  Level 1 (No dependencies):
+  ✅ repo-setup (done)
+  ✅ documentation (done)
+
+  Level 2 (Depends on Level 1):
+  ✅ docker-env (done) → depends on: repo-setup
+  🔄 api-docs (in_progress) → depends on: documentation
+
+  Level 3 (Depends on Level 2):
+  📋 database (ready) → depends on: docker-env
+  🚫 api-tests (blocked) → depends on: api-docs
+
+  Level 4 (Depends on Level 3):
+  🚫 auth-api (blocked) → depends on: database
+  🚫 user-api (blocked) → depends on: database
+
+🎯 FINDING NEXT TASK TO WORK ON:
+
+Show ready tasks (no blocking dependencies):
+  dppm status project web-app
+  # Lists "Ready to Work On" section
+
+Show blocked tasks and their blockers:
+  dppm status blocked --project web-app
+
+💡 DEPENDENCY BEST PRACTICES:
+
+Good Dependencies:
+  • auth-api depends on database (logical)
+  • frontend depends on api (necessary)
+  • deploy depends on tests (safe)
+
+Bad Dependencies:
+  • Circular: A→B→C→A (impossible)
+  • Too deep: A→B→C→D→E→F (bottleneck)
+  • Unnecessary: UI→Database (can work parallel)
+
+🔧 MANAGING DEPENDENCIES:
+
+Add dependency to existing task:
+  dppm task update frontend --dependency-ids "api,auth"
+
+Remove dependency:
+  dppm task update frontend --dependency-ids ""
+
+⚠️ TIPS:
+  • Keep chains shallow (max 3-4 levels)
+  • Allow parallel work where possible
+  • Check for bottlenecks regularly
+  • Complete blocking tasks first
+
+🔍 Related Commands:
+  • dppm wiki "dependencies"      # Dependency management
+  • dppm wiki "blocked tasks"     # Resolving blocks`)
+}
+
+func showProjectBuildingGuide() {
+	fmt.Println(`Project Building Guide
+=====================
+
+🏗️ COMPLETE PROJECT BUILDING WORKFLOW:
+
+Step-by-step guide to building a full project with DPPM.
+
+1️⃣ ANALYZE REQUIREMENTS:
+Before creating anything, understand:
+  • What are the main deliverables?
+  • What are the development phases?
+  • What are the dependencies?
+  • Who will work on what?
+
+2️⃣ CREATE PROJECT STRUCTURE:
+  # Create the project
+  dppm project create ecommerce \
+    --name "E-Commerce Platform" \
+    --owner "dev-team" \
+    --description "Full-stack e-commerce solution"
+
+3️⃣ DEFINE PHASES:
+  # Phase 1: Foundation
+  dppm phase create foundation --project ecommerce \
+    --name "Foundation Setup" \
+    --goal "Set up development environment and infrastructure"
+
+  # Phase 2: Backend
+  dppm phase create backend --project ecommerce \
+    --name "Backend Development" \
+    --goal "Build API, database, and business logic"
+
+  # Phase 3: Frontend
+  dppm phase create frontend --project ecommerce \
+    --name "Frontend Development" \
+    --goal "Build user interface and experience"
+
+  # Phase 4: Integration
+  dppm phase create integration --project ecommerce \
+    --name "Integration & Testing" \
+    --goal "Connect all components and test"
+
+4️⃣ CREATE TASKS WITH DEPENDENCIES:
+  # Foundation tasks (no dependencies)
+  dppm task create repo --project ecommerce --phase foundation \
+    --title "Repository Setup" --priority high
+
+  dppm task create docker --project ecommerce --phase foundation \
+    --title "Docker Environment" --dependency-ids "repo"
+
+  # Backend tasks
+  dppm task create database --project ecommerce --phase backend \
+    --title "Database Schema" --dependency-ids "docker"
+
+  dppm task create auth --project ecommerce --phase backend \
+    --title "Authentication System" --dependency-ids "database"
+
+  dppm task create products-api --project ecommerce --phase backend \
+    --title "Products API" --dependency-ids "database"
+
+  dppm task create cart-api --project ecommerce --phase backend \
+    --title "Shopping Cart API" --dependency-ids "products-api"
+
+  # Frontend tasks
+  dppm task create ui-setup --project ecommerce --phase frontend \
+    --title "React Setup" --dependency-ids "docker"
+
+  dppm task create product-list --project ecommerce --phase frontend \
+    --title "Product Listing" --dependency-ids "products-api,ui-setup"
+
+  dppm task create cart-ui --project ecommerce --phase frontend \
+    --title "Shopping Cart UI" --dependency-ids "cart-api,ui-setup"
+
+5️⃣ VERIFY PROJECT STRUCTURE:
+  # Check overall status
+  dppm status project ecommerce
+
+  # View dependency order
+  dppm status dependencies --project ecommerce
+
+  # Find first tasks to work on
+  dppm status project ecommerce | grep "Ready"
+
+6️⃣ EXECUTE PROJECT:
+  # Start with ready tasks
+  dppm task update repo --status in_progress
+  # ... work on task ...
+  dppm task update repo --status done
+
+  # Check what's unblocked
+  dppm status project ecommerce
+
+  # Continue with next ready task
+  dppm task update docker --status in_progress
+
+7️⃣ MONITOR PROGRESS:
+  # Daily status check
+  dppm status project ecommerce
+
+  # Check active work
+  dppm status active --project ecommerce
+
+  # Find blockers
+  dppm status blocked --project ecommerce
+
+📊 PROJECT METRICS:
+Track progress with:
+  • Tasks completed vs total
+  • Story points completed
+  • Blocked task count
+  • Phase completion status
+
+💡 SUCCESS TIPS:
+  ✅ Plan all phases before creating tasks
+  ✅ Set realistic dependencies
+  ✅ Keep 2-3 tasks ready at all times
+  ✅ Review and update daily
+  ✅ Mark tasks done promptly
+
+🔍 Related Commands:
+  • dppm wiki "complete"          # Full example
+  • dppm wiki "project types"     # Choosing structure
+  • dppm wiki "ai workflow"       # AI-optimized workflow`)
+}
+
+func showListActiveGuide() {
+	fmt.Println(`List Active Work Guide
+=====================
+
+📋 COMMANDS TO LIST ACTIVE WORK:
+
+All active work across projects:
+  dppm status active
+
+Active tasks in specific project:
+  dppm list tasks --project web-app --status in_progress
+
+Active phases:
+  dppm list phases --status active
+
+Ready to start tasks:
+  dppm status project web-app
+  # Shows "Ready to Work On" section
+
+📊 COMPREHENSIVE ACTIVE WORK VIEW:
+
+Get full picture of active work:
+  # 1. Show all in-progress tasks
+  dppm status active
+
+  # 2. Show ready tasks
+  dppm status project PROJECT_NAME
+
+  # 3. Show blocked tasks
+  dppm status blocked
+
+Example Combined Output:
+  🔄 IN PROGRESS (3 tasks):
+  • web-app: Authentication API (john)
+  • web-app: User Interface (jane)
+  • mobile: Login Screen (alex)
+
+  📋 READY TO START (5 tasks):
+  • web-app: Database Backup
+  • web-app: API Documentation
+  • mobile: Settings Page
+  • mobile: Profile View
+  • backend: Cache Layer
+
+  🚫 BLOCKED (2 tasks):
+  • web-app: Deploy (waiting for: Tests)
+  • mobile: API Integration (waiting for: API)
+
+🔧 FILTERING ACTIVE WORK:
+
+By assignee:
+  dppm list tasks --assignee john --status in_progress
+
+By priority:
+  dppm list tasks --priority high --status in_progress
+
+By phase:
+  dppm list tasks --phase backend --status in_progress
+
+By date:
+  dppm list tasks --due-today --status in_progress
+
+💡 DASHBOARD VIEW:
+Create a project dashboard:
+  echo "=== PROJECT DASHBOARD ==="
+  dppm status project web-app
+  echo ""
+  echo "=== ACTIVE TASKS ==="
+  dppm list tasks --project web-app --status in_progress
+  echo ""
+  echo "=== BLOCKED TASKS ==="
+  dppm status blocked --project web-app
+
+🔍 Related Commands:
+  • dppm wiki "active tasks"      # Task-specific guide
+  • dppm wiki "active phases"     # Phase-specific guide
+  • dppm wiki "status commands"   # All status options`)
+}
+
+func showFindTaskGuide() {
+	fmt.Println(`Find Task Guide
+==============
+
+🔍 SEARCHING FOR SPECIFIC TASKS:
+
+Find task by ID:
+  dppm task show AUTH-001
+
+Find tasks by title (grep):
+  dppm list tasks --project web-app | grep -i "auth"
+
+Find tasks by status:
+  dppm list tasks --project web-app --status todo
+  dppm list tasks --project web-app --status in_progress
+  dppm list tasks --project web-app --status done
+
+Find tasks by assignee:
+  dppm list tasks --assignee john-doe
+
+Find tasks by priority:
+  dppm list tasks --priority high
+  dppm list tasks --priority critical
+
+Find tasks in phase:
+  dppm list tasks --phase backend
+
+📊 ADVANCED SEARCH PATTERNS:
+
+Find blocked tasks with specific dependency:
+  dppm status dependencies --project web-app | grep "auth-api"
+
+Find tasks modified today:
+  dppm list tasks --updated-today
+
+Find overdue tasks:
+  dppm list tasks --overdue
+
+Find tasks with specific labels:
+  dppm list tasks --label "bug"
+  dppm list tasks --label "security"
+
+🔧 SEARCH COMBINATIONS:
+
+High priority blocked tasks:
+  dppm status blocked --project web-app | grep "high"
+
+In-progress tasks by specific developer:
+  dppm list tasks --assignee john --status in_progress
+
+Tasks in backend phase that are ready:
+  dppm list tasks --phase backend --status todo |
+    grep -v "blocked"
+
+💡 CREATE CUSTOM SEARCHES:
+
+Alias for common searches:
+  alias find-my-tasks='dppm list tasks --assignee $(whoami)'
+  alias find-urgent='dppm list tasks --priority critical'
+  alias find-blocked='dppm status blocked'
+
+Script for task search:
+  #!/bin/bash
+  # find-task.sh
+  dppm list tasks --project $1 | grep -i "$2"
+
+  # Usage: ./find-task.sh web-app "auth"
+
+📝 TASK INFORMATION:
+
+Once found, get full details:
+  dppm task show TASK-ID
+
+View task file directly:
+  cat ~/Dropbox/project-management/projects/PROJECT/phases/PHASE/tasks/TASK.yaml
+
+🔍 Related Commands:
+  • dppm wiki "list active"       # List active work
+  • dppm wiki "status commands"   # Status queries
+  • dppm wiki "task workflow"     # Task management`)
+}
+
+func showAIWorkflowGuide() {
+	fmt.Println(`AI-Optimized Workflow Guide
+===========================
+
+🤖 DPPM IS DESIGNED FOR AI WORKFLOWS:
+
+DPPM provides structured, verbose output perfect for AI parsing and
+comprehensive wiki system for self-service learning.
+
+📚 AI SELF-DISCOVERY:
+
+1. AI runs dppm without args:
+   dppm
+   # Shows smart guide with next steps
+
+2. AI searches for help:
+   dppm --wiki "how to create project"
+   dppm --wiki "task dependencies"
+   dppm --wiki "find blocked tasks"
+
+3. AI gets complete examples:
+   dppm wiki complete
+   # Shows full workflow with all commands
+
+🎯 AI PROJECT WORKFLOW:
+
+Step 1: Understand project scope
+  dppm wiki "project types"
+  # AI learns about phase-based vs task-based
+
+Step 2: Create project structure
+  dppm project create ai-app --name "AI Application"
+  dppm wiki "create phase"
+  dppm phase create ml --project ai-app --name "ML Development"
+
+Step 3: Build task dependency graph
+  dppm wiki "dependencies"
+  dppm task create data-prep --project ai-app --phase ml
+  dppm task create training --project ai-app --phase ml --dependency-ids "data-prep"
+
+Step 4: Monitor and execute
+  dppm status project ai-app
+  # AI sees ready tasks, blocked tasks, progress
+
+Step 5: Find specific information
+  dppm --wiki "active tasks"
+  dppm status active --project ai-app
+  dppm status dependencies --project ai-app
+
+📊 AI-FRIENDLY FEATURES:
+
+Structured Output:
+  • YAML format for easy parsing
+  • Consistent status values
+  • Clear dependency chains
+  • Verbose help text
+
+Self-Service Documentation:
+  • Built-in wiki system
+  • Complete examples
+  • All parameters documented
+  • Common patterns included
+
+Intelligent Defaults:
+  • Smart suggestions in output
+  • Helpful error messages
+  • Next-step guidance
+  • Context-aware help
+
+🔧 AI AUTOMATION EXAMPLES:
+
+Daily status report:
+  dppm status project $PROJECT > daily-report.txt
+  dppm status blocked --project $PROJECT >> daily-report.txt
+  dppm status active --project $PROJECT >> daily-report.txt
+
+Find next task to work on:
+  dppm status project $PROJECT | grep "Ready to Work On" -A 10
+
+Check for blockers:
+  dppm status blocked --project $PROJECT
+  if [ $? -eq 0 ]; then
+    echo "Found blocking issues"
+  fi
+
+💡 AI BEST PRACTICES:
+
+1. Always start with wiki:
+   dppm wiki "topic"
+
+2. Use structured commands:
+   dppm COMMAND SUBCOMMAND --flag value
+
+3. Parse YAML output:
+   dppm task show TASK-ID
+   # Returns structured YAML
+
+4. Follow dependency order:
+   dppm status dependencies --project PROJECT
+
+5. Check before acting:
+   dppm status project PROJECT
+   # Before updating tasks
+
+🚀 COMPLETE AI EXAMPLE:
+
+AI receives request: "Set up a new web project with auth"
+
+AI executes:
+  # Learn how
+  dppm wiki "build project"
+
+  # Create structure
+  dppm project create web --name "Web App"
+  dppm phase create setup --project web
+  dppm phase create auth --project web
+
+  # Create tasks
+  dppm task create repo --project web --phase setup
+  dppm task create docker --project web --phase setup --dependency-ids "repo"
+  dppm task create auth-api --project web --phase auth --dependency-ids "docker"
+
+  # Verify
+  dppm status project web
+  dppm status dependencies --project web
+
+This workflow is fully self-documented and AI-discoverable!
+
+🔍 Related Commands:
+  • dppm wiki list               # All topics
+  • dppm wiki complete           # Full example
+  • dppm --wiki "any question"   # Direct search`)
 }
 
 func init() {
