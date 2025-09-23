@@ -45,6 +45,7 @@ func init() {
 	rootCmd.AddCommand(sprintCmd)
 	rootCmd.AddCommand(taskCmd)
 	rootCmd.AddCommand(listCmd)
+	rootCmd.AddCommand(statusCmd)
 }
 
 func main() {
