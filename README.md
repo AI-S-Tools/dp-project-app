@@ -131,11 +131,87 @@ Appen er bygget i Go med:
 - `gopkg.in/yaml.v3` til YAML parsing
 - Standard library til filhåndtering
 
+## Advanced Task Management Features
+
+### Task Components & Subtasks
+- **Multi-part tasks**: Tasks can be broken into multiple components
+- **Subtask types**: bug, enhancement, feature, documentation
+- **Component status tracking**: Each part can be todo/in_progress/done
+- **Bug issues**: Special subtasks for tracking bugs and fixes
+- **Change requests**: Track modifications and improvements
+
+### Dependency Management
+- **Task dependencies**: Tasks can depend on other tasks (dependency_ids)
+- **Automatic blocking**: Tasks cannot start until dependencies are completed
+- **Dependency validation**: System prevents circular dependencies
+- **Visual dependency chains**: Clear display of task relationships
+
+### Enhanced Status & Reporting
+- **Multi-level status**: Project → Sprint → Task → Components → Issues
+- **Smart filtering**: Show active/pending/completed across all levels
+- **Dependency visualization**: See what's blocking what
+- **Progress tracking**: Automatic calculation of completion percentages
+- **Status summaries**: Quick overview of project health
+
+### Expanded YAML Schema
+
+#### Task with Components
+```yaml
+id: "task-001"
+title: "User Authentication System"
+components:
+  - id: "auth-backend"
+    title: "Backend API"
+    status: "done"
+    type: "feature"
+  - id: "auth-frontend"
+    title: "Frontend UI"
+    status: "in_progress"
+    type: "feature"
+  - id: "auth-tests"
+    title: "Unit Tests"
+    status: "todo"
+    type: "testing"
+issues:
+  - id: "bug-001"
+    title: "Login fails on mobile"
+    type: "bug"
+    status: "todo"
+    parent_component: "auth-frontend"
+dependency_ids: ["task-database", "task-security"]
+blocked_by: ["task-database"]  # Auto-calculated
+```
+
+### Command Extensions
+```bash
+# Component management
+dppm task component add task-001 --title "API Documentation" --type documentation
+dppm task component update auth-backend --status done
+dppm task component list task-001
+
+# Issue tracking
+dppm task issue add task-001 --title "Fix mobile login" --type bug --component auth-frontend
+dppm task issue update bug-001 --status in_progress
+dppm task issue list --type bug --status todo
+
+# Dependency management
+dppm task dependency add task-002 --depends-on task-001
+dppm task dependency remove task-002 task-001
+dppm task dependency check task-002  # Show what's blocking this task
+
+# Status reporting
+dppm status project web-app        # Overall project status
+dppm status dependencies          # Show all dependency chains
+dppm status blocked               # Show all blocked tasks
+dppm status active               # Show all active work
+```
+
 ## Fremtidige Features
 
-- Sprint management commands
-- Task management commands
-- Search og filtering
-- Status reports
+- Advanced sprint planning with capacity
+- Automated progress reporting
+- Gantt chart export
+- Time tracking integration
+- Team collaboration features
 - MCP server integration
-- Web interface
+- Web interface with dependency graphs
