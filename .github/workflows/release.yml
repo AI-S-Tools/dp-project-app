@@ -85,6 +85,8 @@ jobs:
 
     - name: Download all artifacts
       uses: actions/download-artifact@v4
+      with:
+        merge-multiple: true
 
     - name: Get version
       id: version
@@ -97,17 +99,10 @@ jobs:
 
     - name: Generate checksums
       run: |
-        for dir in dppm-*; do
-          if [ -d "$dir" ]; then
-            cd "$dir"
-            for file in *; do
-              if [ -f "$file" ]; then
-                sha256sum "$file" >> ../checksums.txt
-                mv "$file" ../"$file"
-              fi
-            done
-            cd ..
-            rmdir "$dir"
+        ls -la
+        for file in dppm-*; do
+          if [ -f "$file" ]; then
+            sha256sum "$file" >> checksums.txt
           fi
         done
 
