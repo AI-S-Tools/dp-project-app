@@ -81,11 +81,14 @@ func showWikiTopics() {
 =====================
 
 📁 Project Management:
+  • "what is dppm" - Introduction and overview
+  • "getting started" - Quick start guide for beginners
   • "create project" - Complete project creation guide
   • "project types" - Phase-based vs Task-based projects
   • "project structure" - Directory organization
   • "project workflow" - End-to-end project management
   • "build project" - Complete project building workflow
+  • "best practices" - Recommended patterns and tips
 
 📋 Phase Management:
   • "create phase" - Phase creation and organization
@@ -112,6 +115,10 @@ func showWikiTopics() {
   • "time tracking" - Time logging and estimation
   • "issue tracking" - Bug and issue management
   • "project templates" - Using and creating templates
+  • "collaboration" - Working with teams
+  • "automation" - Scripting and CI/CD integration
+  • "reporting" - Generate progress reports
+  • "troubleshooting" - Common issues and solutions
 
 🚀 Complete Workflows:
   • "complete" - Full project creation to completion example
@@ -120,38 +127,45 @@ func showWikiTopics() {
 }
 
 func searchWiki(searchTerm string) {
+	// Convert to lowercase for case-insensitive search
+	searchLower := strings.ToLower(searchTerm)
+
 	switch {
-	case strings.Contains(searchTerm, "create project") || strings.Contains(searchTerm, "project creation"):
+	case strings.Contains(searchLower, "what is dppm") || strings.Contains(searchLower, "introduction"):
+		showIntroductionGuide()
+	case strings.Contains(searchLower, "getting started") || strings.Contains(searchLower, "quick start"):
+		showGettingStartedGuide()
+	case strings.Contains(searchLower, "create project") || strings.Contains(searchLower, "project creation"):
 		showProjectCreationGuide()
-	case strings.Contains(searchTerm, "project types") || strings.Contains(searchTerm, "phase-based") || strings.Contains(searchTerm, "task-based"):
+	case strings.Contains(searchLower, "project types") || strings.Contains(searchLower, "phase-based") || strings.Contains(searchLower, "task-based"):
 		showProjectTypesGuide()
-	case strings.Contains(searchTerm, "create phase") || strings.Contains(searchTerm, "phase creation"):
+	case strings.Contains(searchLower, "create phase") || strings.Contains(searchLower, "phase creation") || strings.Contains(searchLower, "phase management") || strings.Contains(searchLower, "phase workflow"):
 		showPhaseCreationGuide()
-	case strings.Contains(searchTerm, "create task") || strings.Contains(searchTerm, "task creation"):
+	case strings.Contains(searchLower, "create task") || strings.Contains(searchLower, "task creation"):
 		showTaskCreationGuide()
-	case strings.Contains(searchTerm, "dependencies") || strings.Contains(searchTerm, "dependency"):
+	case strings.Contains(searchLower, "dependencies") || strings.Contains(searchLower, "dependency"):
 		showDependencyGuide()
-	case strings.Contains(searchTerm, "status") || strings.Contains(searchTerm, "reporting"):
+	case strings.Contains(searchLower, "status") || strings.Contains(searchLower, "reporting"):
 		showStatusGuide()
-	case strings.Contains(searchTerm, "blocked") || strings.Contains(searchTerm, "blocking"):
+	case strings.Contains(searchLower, "blocked") || strings.Contains(searchLower, "blocking"):
 		showBlockedTasksGuide()
-	case strings.Contains(searchTerm, "structure") || strings.Contains(searchTerm, "organization"):
+	case strings.Contains(searchLower, "structure") || strings.Contains(searchLower, "organization"):
 		showStructureGuide()
-	case strings.Contains(searchTerm, "workflow") || strings.Contains(searchTerm, "process"):
+	case strings.Contains(searchLower, "workflow") || strings.Contains(searchLower, "process"):
 		showWorkflowGuide()
-	case strings.Contains(searchTerm, "active tasks") || strings.Contains(searchTerm, "in progress"):
+	case strings.Contains(searchLower, "active tasks") || strings.Contains(searchLower, "in progress"):
 		showActiveTasksGuide()
-	case strings.Contains(searchTerm, "active phases") || strings.Contains(searchTerm, "current phases"):
+	case strings.Contains(searchLower, "active phases") || strings.Contains(searchLower, "current phases"):
 		showActivePhasesGuide()
-	case strings.Contains(searchTerm, "dependency order") || strings.Contains(searchTerm, "task order"):
+	case strings.Contains(searchLower, "dependency order") || strings.Contains(searchLower, "task order"):
 		showDependencyOrderGuide()
-	case strings.Contains(searchTerm, "build project") || strings.Contains(searchTerm, "project building"):
+	case strings.Contains(searchLower, "build project") || strings.Contains(searchLower, "project building"):
 		showProjectBuildingGuide()
-	case strings.Contains(searchTerm, "list active") || strings.Contains(searchTerm, "active work"):
+	case strings.Contains(searchLower, "list active") || strings.Contains(searchLower, "active work"):
 		showListActiveGuide()
-	case strings.Contains(searchTerm, "find task") || strings.Contains(searchTerm, "search task"):
+	case strings.Contains(searchLower, "find task") || strings.Contains(searchLower, "search task"):
 		showFindTaskGuide()
-	case strings.Contains(searchTerm, "ai workflow") || strings.Contains(searchTerm, "ai project"):
+	case strings.Contains(searchLower, "ai workflow") || strings.Contains(searchLower, "ai project"):
 		showAIWorkflowGuide()
 	default:
 		fmt.Printf("No specific guide found for '%s'\n\n", searchTerm)
@@ -161,6 +175,114 @@ func searchWiki(searchTerm string) {
 		fmt.Println("  dppm wiki \"dependency order\"")
 		fmt.Println("  dppm wiki list")
 	}
+}
+
+func showIntroductionGuide() {
+	fmt.Println(`What is DPPM?
+============
+
+DPPM (Dropbox Project Manager) is a comprehensive CLI tool for managing
+projects, phases, and tasks using Dropbox as the storage backend.
+
+🎯 PURPOSE:
+DPPM was designed specifically for AI-driven development workflows,
+providing verbose, structured output that AI systems can easily parse
+and understand.
+
+✨ KEY FEATURES:
+  • YAML-based data storage
+  • Hierarchical project organization
+  • Phase-based development management
+  • Comprehensive dependency tracking
+  • Built-in knowledge base (wiki)
+  • Cross-platform via Dropbox sync
+  • AI-optimized verbose output
+
+📁 STORAGE:
+All data is stored in: ~/Dropbox/project-management/
+This enables automatic sync across all your devices.
+
+🤖 AI-FIRST DESIGN:
+  • Self-documenting commands
+  • Built-in wiki for self-service
+  • Structured YAML output
+  • Verbose help everywhere
+  • Complete examples included
+
+🚀 USE CASES:
+  • Software development projects
+  • Task and bug tracking
+  • Sprint/phase planning
+  • Dependency management
+  • Team collaboration
+  • Personal task management
+
+🔍 Getting Help:
+  dppm wiki "getting started"    # Quick start guide
+  dppm wiki list                 # All available topics
+  dppm --help                    # Command reference`)
+}
+
+func showGettingStartedGuide() {
+	fmt.Println(`Getting Started Guide
+====================
+
+🚀 QUICK START IN 5 MINUTES:
+
+1️⃣ CHECK INSTALLATION:
+   dppm
+   # Should show the startup guide
+
+2️⃣ CREATE YOUR FIRST PROJECT:
+   dppm project create my-project --name "My First Project" --owner "your-name"
+
+3️⃣ ADD A PHASE (OPTIONAL):
+   dppm phase create phase-1 --project my-project --name "Initial Development"
+
+4️⃣ CREATE YOUR FIRST TASK:
+   dppm task create first-task \
+     --project my-project \
+     --phase phase-1 \
+     --title "Set up repository" \
+     --priority high
+
+5️⃣ CHECK PROJECT STATUS:
+   dppm status project my-project
+
+📚 LEARNING PATH:
+
+Beginner:
+  1. dppm wiki "what is dppm"      # Understand the tool
+  2. dppm wiki "project types"     # Choose project structure
+  3. dppm wiki "create project"    # Create first project
+  4. dppm wiki "create task"       # Add tasks
+
+Intermediate:
+  1. dppm wiki "dependencies"      # Task relationships
+  2. dppm wiki "phase workflow"    # Phase management
+  3. dppm wiki "active tasks"      # Track progress
+  4. dppm wiki "blocked tasks"     # Resolve blocks
+
+Advanced:
+  1. dppm wiki "build project"     # Complete workflows
+  2. dppm wiki "ai workflow"       # AI automation
+  3. dppm wiki "automation"        # CI/CD integration
+
+💡 TIPS FOR SUCCESS:
+  • Start simple with a task-based project
+  • Use phases for projects > 10 tasks
+  • Set dependencies thoughtfully
+  • Check status daily
+  • Use wiki for any questions
+
+🆘 GETTING HELP:
+  dppm wiki "topic"               # Search for help
+  dppm wiki list                  # See all topics
+  dppm wiki complete              # Full example
+
+🔍 Next Steps:
+  dppm wiki "project types"       # Understand options
+  dppm wiki "create project"      # Start building`)
 }
 
 func showProjectCreationGuide() {
