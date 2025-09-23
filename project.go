@@ -29,11 +29,67 @@ type Project struct {
 var projectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "Project management commands",
+	Long: `Project Management Commands
+
+Manage projects in your Dropbox project management system. Projects are
+the top-level organizational unit that contain sprints and tasks.
+
+Project Structure:
+  ~/Dropbox/project-management/projects/PROJECT_ID/
+  ├── project.yaml           # Project metadata and configuration
+  └── sprints/              # Directory containing all sprints
+      └── SPRINT_ID/        # Individual sprint directories
+
+Available Commands:
+  create    Create a new project with specified parameters
+  list      List all projects (use 'dppm list projects' instead)
+  show      Display detailed project information
+  update    Update project metadata
+  delete    Remove a project and all its data
+
+Examples:
+  dppm project create web-app --name "Web Application" --owner "dev-team"
+  dppm project show web-app
+  dppm project update web-app --status completed
+
+For more information about a specific command, use:
+  dppm project [command] --help`,
 }
 
 var createProjectCmd = &cobra.Command{
 	Use:   "create [project-id]",
 	Short: "Create a new project",
+	Long: `Create a New Project
+
+Creates a new project in the Dropbox project management system with the
+specified project ID and metadata. This will create the directory structure
+and initial project.yaml file.
+
+Arguments:
+  project-id    Unique identifier for the project (required)
+                Must be lowercase, alphanumeric with hyphens allowed
+                Examples: web-app, mobile-project, ai-tool
+
+Directory Structure Created:
+  ~/Dropbox/project-management/projects/PROJECT_ID/
+  ├── project.yaml          # Project metadata file
+  └── sprints/             # Empty directory for future sprints
+
+Project Status Values:
+  active      Project is currently being worked on (default)
+  completed   Project has been finished
+  paused      Project is temporarily stopped
+  cancelled   Project has been abandoned
+
+Examples:
+  dppm project create web-app --name "Web Application"
+  dppm project create ai-tool --name "AI Development Tool" --owner "john-doe" --description "Advanced AI automation tool"
+  dppm project create mobile --name "Mobile App" --owner "dev-team" --description "Cross-platform mobile application"
+
+AI Usage Tips:
+  - Use descriptive project names for better organization
+  - Include clear descriptions for AI context understanding
+  - Set appropriate owners for team collaboration`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		projectID := args[0]

@@ -1,13 +1,22 @@
-# DP Project App
+# DPPM - Dropbox Project Manager
 
-Dropbox Project Management CLI - Et kommandolinje værktøj til at administrere projekter, sprints og tasks i Dropbox.
+A comprehensive CLI tool for managing projects, sprints, and tasks using Dropbox as the storage backend. Perfect for AI-driven development workflows with verbose, AI-friendly output.
+
+## Features
+
+- ✅ YAML-based project, sprint, and task management
+- ✅ Hierarchical project organization
+- ✅ Cross-platform synchronization via Dropbox
+- ✅ AI-friendly verbose output and comprehensive help
+- ✅ Template-based project creation
+- ✅ Extensive documentation and examples
 
 ## Installation
 
 ```bash
 cd ~/dp-project-app
-go build -o dp
-sudo cp dp /usr/local/bin/
+go build -o dppm
+sudo cp dppm /usr/local/bin/
 ```
 
 ## Struktur
@@ -38,25 +47,44 @@ Projekter gemmes i `~/Dropbox/project-management/` med følgende struktur:
 
 ```bash
 # Opret nyt projekt
-dp project create my-project --name "Mit Projekt" --description "Beskrivelse" --owner "username"
+dppm project create my-project --name "Mit Projekt" --description "Beskrivelse" --owner "username"
 
 # List alle projekter
-dp list projects
+dppm list projects
 ```
 
 ### Sprints (kommer snart)
 
 ```bash
-dp sprint create sprint-1 --project my-project
-dp sprint list --project my-project
+dppm sprint create sprint-1 --project my-project
+dppm sprint list --project my-project
 ```
 
 ### Tasks (kommer snart)
 
 ```bash
-dp task create task-1 --project my-project --sprint sprint-1 --title "Min task"
-dp task list --project my-project
-dp task update task-1 --status in_progress
+dppm task create task-1 --project my-project --sprint sprint-1 --title "Min task"
+dppm task list --project my-project
+dppm task update task-1 --status in_progress
+```
+
+## Comprehensive Help System
+
+DPPM features extensive help documentation for every command:
+
+```bash
+# Main help
+dppm --help
+
+# Project command help
+dppm project --help
+
+# Specific command help
+dppm project create --help
+
+# List command help
+dppm list --help
+dppm list projects --help
 ```
 
 ## YAML Format

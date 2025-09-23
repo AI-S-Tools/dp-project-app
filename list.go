@@ -12,11 +12,73 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List projects, sprints, or tasks",
+	Long: `List Command
+
+Display various entities in your Dropbox project management system.
+Provides organized views of projects, sprints, and tasks with detailed
+information formatted for both human reading and AI processing.
+
+Available Subcommands:
+  projects    List all projects with status and metadata
+  sprints     List sprints for a specific project
+  tasks       List tasks for a project or sprint
+
+Output Format:
+  Each listing provides comprehensive information including:
+  - Unique identifiers
+  - Names and descriptions
+  - Status information
+  - Ownership details
+  - Creation and update timestamps
+  - Hierarchical relationships
+
+Examples:
+  dppm list projects                    # Show all projects
+  dppm list sprints --project web-app  # Show sprints for web-app project
+  dppm list tasks --project web-app    # Show all tasks in web-app project
+  dppm list tasks --sprint sprint-1    # Show tasks in specific sprint
+
+AI Usage:
+  This command is designed to provide verbose, structured output that
+  AI systems can easily parse and understand for project analysis,
+  status reporting, and workflow automation.`,
 }
 
 var listProjectsCmd = &cobra.Command{
 	Use:   "projects",
 	Short: "List all projects",
+	Long: `List All Projects
+
+Display a comprehensive list of all projects in the Dropbox project
+management system. Each project entry includes detailed metadata
+to help with project overview and status tracking.
+
+Information Displayed:
+  • Project ID (unique identifier)
+  • Project Name (human-readable name)
+  • Status (active, completed, paused, cancelled)
+  • Owner (responsible person or team)
+  • Creation Date (when project was created)
+  • Last Updated (most recent modification)
+  • Description (if available)
+  • Current Sprint (if any)
+  • Total Sprints (count)
+
+Output Format:
+  Projects are displayed in a structured format with clear separators
+  for easy reading by both humans and AI systems. Each project is
+  separated by a divider line for visual clarity.
+
+Examples:
+  dppm list projects              # Show all projects
+  dppm list projects | grep web   # Filter projects containing 'web'
+
+AI Integration:
+  The output is designed to be easily parseable by AI systems for:
+  - Project status analysis
+  - Resource allocation assessment
+  - Progress tracking
+  - Automated reporting`,
 	Run: func(cmd *cobra.Command, args []string) {
 		projectsDir := filepath.Join(projectsPath, "projects")
 

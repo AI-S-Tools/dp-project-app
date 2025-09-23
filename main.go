@@ -9,9 +9,30 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "dp",
-	Short: "Dropbox Project Management CLI",
-	Long:  "A CLI tool for managing projects, sprints, and tasks in Dropbox",
+	Use:   "dppm",
+	Short: "Dropbox Project Manager (DPPM)",
+	Long: `DPPM - Dropbox Project Manager
+
+A comprehensive CLI tool for managing projects, sprints, and tasks using
+Dropbox as the storage backend. Perfect for AI-driven development workflows.
+
+Features:
+  • YAML-based project, sprint, and task management
+  • Hierarchical project organization
+  • Cross-platform synchronization via Dropbox
+  • AI-friendly verbose output and documentation
+  • Template-based project creation
+  • Comprehensive help system
+
+Storage Location: ~/Dropbox/project-management/
+
+Examples:
+  dppm project create my-project --name "My Project" --owner "username"
+  dppm list projects
+  dppm project show my-project
+  dppm --help
+
+For detailed command help, use: dppm [command] --help`,
 }
 
 var projectsPath string
