@@ -21,7 +21,7 @@ Features:
   • Hierarchical project organization with phase folders
   • Cross-platform synchronization via Dropbox
   • AI-friendly verbose output and documentation
-  • Built-in knowledge base and examples
+  • Built-in knowledge base and examples (dppm wiki)
   • Comprehensive dependency management
   • Template-based project creation
 
@@ -70,15 +70,18 @@ func init() {
 	rootCmd.AddCommand(wikiCmd)
 
 	// Add --wiki flag for direct search
-	rootCmd.Flags().String("wiki", "", "Search DPPM knowledge base")
+	rootCmd.Flags().String("wiki", "", "Search DPPM knowledge base (e.g. --wiki \"create task\")")
 }
 
 func main() {
-	// Check for --wiki flag before executing
-	if wikiQuery, _ := rootCmd.Flags().GetString("wiki"); wikiQuery != "" {
-		// Execute wiki search directly
-		wikiCmd.Run(wikiCmd, []string{wikiQuery})
-		return
+	// Check for --wiki flag in args before executing
+	for i, arg := range os.Args {
+		if arg == "--wiki" && i+1 < len(os.Args) {
+			// Execute wiki search directly
+			wikiQuery := os.Args[i+1]
+			wikiCmd.Run(wikiCmd, []string{wikiQuery})
+			return
+		}
 	}
 
 	if err := rootCmd.Execute(); err != nil {
