@@ -71,7 +71,7 @@ jobs:
         go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" -o ${{ matrix.name }}
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}
         path: ${{ matrix.name }}
@@ -84,7 +84,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
 
     - name: Get version
       id: version
@@ -113,12 +113,12 @@ jobs:
 
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ steps.version.outputs.VERSION }}
-        release_name: DPPM ${{ steps.version.outputs.VERSION }}
+        name: DPPM ${{ steps.version.outputs.VERSION }}
         body: |
           # DPPM ${{ steps.version.outputs.VERSION }}
 
@@ -172,73 +172,11 @@ jobs:
           Verify your download with the checksums in `checksums.txt`.
         draft: false
         prerelease: false
-
-    - name: Upload Linux amd64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dppm-linux-amd64
-        asset_name: dppm-linux-amd64
-        asset_content_type: application/octet-stream
-
-    - name: Upload Linux arm64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dppm-linux-arm64
-        asset_name: dppm-linux-arm64
-        asset_content_type: application/octet-stream
-
-    - name: Upload macOS amd64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dppm-macos-amd64
-        asset_name: dppm-macos-amd64
-        asset_content_type: application/octet-stream
-
-    - name: Upload macOS arm64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dppm-macos-arm64
-        asset_name: dppm-macos-arm64
-        asset_content_type: application/octet-stream
-
-    - name: Upload Windows amd64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dppm-windows-amd64.exe
-        asset_name: dppm-windows-amd64.exe
-        asset_content_type: application/octet-stream
-
-    - name: Upload Windows arm64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dppm-windows-arm64.exe
-        asset_name: dppm-windows-arm64.exe
-        asset_content_type: application/octet-stream
-
-    - name: Upload checksums
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./checksums.txt
-        asset_name: checksums.txt
-        asset_content_type: text/plain
+        files: |
+          dppm-linux-amd64
+          dppm-linux-arm64
+          dppm-macos-amd64
+          dppm-macos-arm64
+          dppm-windows-amd64.exe
+          dppm-windows-arm64.exe
+          checksums.txt
