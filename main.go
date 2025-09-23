@@ -42,7 +42,7 @@ func init() {
 	projectsPath = filepath.Join(home, "Dropbox", "project-management")
 
 	rootCmd.AddCommand(projectCmd)
-	rootCmd.AddCommand(sprintCmd)
+	rootCmd.AddCommand(phaseCmd)
 	rootCmd.AddCommand(taskCmd)
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(statusCmd)

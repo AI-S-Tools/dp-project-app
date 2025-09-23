@@ -14,7 +14,7 @@ type Task struct {
 	ID          string            `yaml:"id"`
 	Title       string            `yaml:"title"`
 	ProjectID   string            `yaml:"project_id"`
-	SprintID    string            `yaml:"sprint_id,omitempty"`
+	PhaseID     string            `yaml:"phase_id,omitempty"`
 	Status      string            `yaml:"status"`
 	Priority    string            `yaml:"priority"`
 	Assignee    string            `yaml:"assignee,omitempty"`
@@ -134,14 +134,14 @@ Arguments:
 
 Examples:
   dppm task create auth-system --project dash-lxd --title "User Authentication System"
-  dppm task create file-ops --project web-app --title "File Operations" --sprint sprint-1
+  dppm task create file-ops --project web-app --title "File Operations" --phase phase-1
   dppm task create bug-fix --project api --title "Fix Login Bug" --priority high`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		taskID := args[0]
 		title, _ := cmd.Flags().GetString("title")
 		projectID, _ := cmd.Flags().GetString("project")
-		sprintID, _ := cmd.Flags().GetString("sprint")
+		phaseID, _ := cmd.Flags().GetString("phase")
 		description, _ := cmd.Flags().GetString("description")
 		priority, _ := cmd.Flags().GetString("priority")
 		assignee, _ := cmd.Flags().GetString("assignee")
@@ -157,7 +157,7 @@ Examples:
 			ID:          taskID,
 			Title:       title,
 			ProjectID:   projectID,
-			SprintID:    sprintID,
+			PhaseID:     phaseID,
 			Status:      "todo",
 			Priority:    priority,
 			Assignee:    assignee,
@@ -176,8 +176,8 @@ Examples:
 
 		// Create task directory structure
 		var taskDir string
-		if sprintID != "" {
-			taskDir = filepath.Join(projectsPath, "projects", projectID, "sprints", sprintID, "tasks")
+		if phaseID != "" {
+			taskDir = filepath.Join(projectsPath, "projects", projectID, "phases", phaseID, "tasks")
 		} else {
 			taskDir = filepath.Join(projectsPath, "projects", projectID, "tasks")
 		}
@@ -200,8 +200,8 @@ Examples:
 		}
 
 		fmt.Printf("Task '%s' created successfully in project '%s'\n", taskID, projectID)
-		if sprintID != "" {
-			fmt.Printf("Assigned to sprint: %s\n", sprintID)
+		if phaseID != "" {
+			fmt.Printf("Assigned to phase: %s\n", phaseID)
 		}
 	},
 }
@@ -209,7 +209,7 @@ Examples:
 func init() {
 	createTaskCmd.Flags().StringP("title", "t", "", "Task title")
 	createTaskCmd.Flags().StringP("project", "p", "", "Project ID (required)")
-	createTaskCmd.Flags().StringP("sprint", "s", "", "Sprint ID (optional)")
+	createTaskCmd.Flags().StringP("phase", "s", "", "Phase ID (optional)")
 	createTaskCmd.Flags().StringP("description", "d", "", "Task description")
 	createTaskCmd.Flags().String("priority", "medium", "Task priority (low, medium, high, critical)")
 	createTaskCmd.Flags().StringP("assignee", "a", "", "Task assignee")

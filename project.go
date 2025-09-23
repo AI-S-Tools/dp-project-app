@@ -22,8 +22,8 @@ type Project struct {
 	Tags        []string          `yaml:"tags,omitempty"`
 	Metadata    map[string]interface{} `yaml:"metadata,omitempty"`
 	Notes       string            `yaml:"notes,omitempty"`
-	CurrentSprint string          `yaml:"current_sprint,omitempty"`
-	Sprints     []string          `yaml:"sprints,omitempty"`
+	CurrentPhase string          `yaml:"current_phase,omitempty"`
+	Phases     []string          `yaml:"phases,omitempty"`
 }
 
 var projectCmd = &cobra.Command{
@@ -32,13 +32,13 @@ var projectCmd = &cobra.Command{
 	Long: `Project Management Commands
 
 Manage projects in your Dropbox project management system. Projects are
-the top-level organizational unit that contain sprints and tasks.
+the top-level organizational unit that contain phases and tasks.
 
 Project Structure:
   ~/Dropbox/project-management/projects/PROJECT_ID/
   ├── project.yaml           # Project metadata and configuration
-  └── sprints/              # Directory containing all sprints
-      └── SPRINT_ID/        # Individual sprint directories
+  └── phases/              # Directory containing all phases
+      └── PHASE_ID/        # Individual phase directories
 
 Available Commands:
   create    Create a new project with specified parameters
@@ -73,7 +73,7 @@ Arguments:
 Directory Structure Created:
   ~/Dropbox/project-management/projects/PROJECT_ID/
   ├── project.yaml          # Project metadata file
-  └── sprints/             # Empty directory for future sprints
+  └── phases/             # Empty directory for future phases
 
 Project Status Values:
   active      Project is currently being worked on (default)
@@ -110,7 +110,7 @@ AI Usage Tips:
 			Created:     time.Now().Format("2006-01-02"),
 			Updated:     time.Now().Format("2006-01-02"),
 			Tags:        []string{},
-			Sprints:     []string{},
+			Phases:     []string{},
 		}
 
 		projectDir := filepath.Join(projectsPath, "projects", projectID)
@@ -119,9 +119,9 @@ AI Usage Tips:
 			return
 		}
 
-		sprintsDir := filepath.Join(projectDir, "sprints")
-		if err := os.MkdirAll(sprintsDir, 0755); err != nil {
-			fmt.Fprintf(os.Stderr, "Error creating sprints directory: %v\n", err)
+		phasesDir := filepath.Join(projectDir, "phases")
+		if err := os.MkdirAll(phasesDir, 0755); err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating phases directory: %v\n", err)
 			return
 		}
 

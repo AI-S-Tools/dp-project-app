@@ -11,17 +11,17 @@ import (
 
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List projects, sprints, or tasks",
+	Short: "List projects, phases, or tasks",
 	Long: `List Command
 
 Display various entities in your Dropbox project management system.
-Provides organized views of projects, sprints, and tasks with detailed
+Provides organized views of projects, phases, and tasks with detailed
 information formatted for both human reading and AI processing.
 
 Available Subcommands:
   projects    List all projects with status and metadata
-  sprints     List sprints for a specific project
-  tasks       List tasks for a project or sprint
+  phases      List phases for a specific project
+  tasks       List tasks for a project or phase
 
 Output Format:
   Each listing provides comprehensive information including:
@@ -34,9 +34,9 @@ Output Format:
 
 Examples:
   dppm list projects                    # Show all projects
-  dppm list sprints --project web-app  # Show sprints for web-app project
+  dppm list phases --project web-app   # Show phases for web-app project
   dppm list tasks --project web-app    # Show all tasks in web-app project
-  dppm list tasks --sprint sprint-1    # Show tasks in specific sprint
+  dppm list tasks --phase phase-1      # Show tasks in specific phase
 
 AI Usage:
   This command is designed to provide verbose, structured output that
@@ -61,8 +61,8 @@ Information Displayed:
   • Creation Date (when project was created)
   • Last Updated (most recent modification)
   • Description (if available)
-  • Current Sprint (if any)
-  • Total Sprints (count)
+  • Current Phase (if any)
+  • Total Phases (count)
 
 Output Format:
   Projects are displayed in a structured format with clear separators

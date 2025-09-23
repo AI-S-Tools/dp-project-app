@@ -136,7 +136,32 @@ Shows the dependency graph and highlights potential issues.`,
 func loadProjectTasks(projectID string) ([]Task, error) {
 	var tasks []Task
 
+	// Load tasks from phases directories
+	phasesDir := filepath.Join(projectsPath, "projects", projectID, "phases")
+	phaseEntries, err := os.ReadDir(phasesDir)
+	if err == nil {
+		for _, phaseEntry := range phaseEntries {
+			if phaseEntry.IsDir() {
+				tasksDir := filepath.Join(phasesDir, phaseEntry.Name(), "tasks")
+				if phaseTasks, err := loadTasksFromDir(tasksDir); err == nil {
+					tasks = append(tasks, phaseTasks...)
+				}
+			}
+		}
+	}
+
+	// Also check for tasks directly in project directory (for backwards compatibility)
 	tasksDir := filepath.Join(projectsPath, "projects", projectID, "tasks")
+
+	if directTasks, err := loadTasksFromDir(tasksDir); err == nil {
+		tasks = append(tasks, directTasks...)
+	}
+
+	return tasks, nil
+}
+
+func loadTasksFromDir(tasksDir string) ([]Task, error) {
+	var tasks []Task
 
 	entries, err := os.ReadDir(tasksDir)
 	if err != nil {
