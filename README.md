@@ -13,8 +13,51 @@ A comprehensive CLI tool for managing projects, sprints, and tasks using Dropbox
 
 ## Installation
 
+### Option 1: One-Line Install (Recommended)
+
 ```bash
-cd ~/dp-project-app
+curl -fsSL https://raw.githubusercontent.com/AI-S-Tools/dp-project-app/master/install.sh | bash
+```
+
+This script automatically:
+- ✅ Detects your platform (Linux, macOS, Windows)
+- ✅ Downloads the appropriate binary
+- ✅ Installs to the correct location
+- ✅ Makes it executable
+
+### Option 2: Manual Download
+
+Download the latest binary for your platform from [Releases](https://github.com/AI-S-Tools/dp-project-app/releases):
+
+#### Linux / macOS
+```bash
+# Download binary (replace with your platform)
+wget https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-amd64
+
+# Make executable and install
+chmod +x dppm-linux-amd64
+sudo mv dppm-linux-amd64 /usr/local/bin/dppm
+
+# Verify installation
+dppm --version
+dppm wiki "getting started"
+```
+
+#### Windows
+1. Download `dppm-windows-amd64.exe` from [Releases](https://github.com/AI-S-Tools/dp-project-app/releases)
+2. Move to a directory in your PATH
+3. Run: `dppm wiki "getting started"`
+
+#### Available Platforms
+- **Linux**: amd64, arm64
+- **macOS**: amd64 (Intel), arm64 (Apple Silicon)
+- **Windows**: amd64, arm64
+
+### Option 3: Build from Source
+
+```bash
+git clone https://github.com/AI-S-Tools/dp-project-app.git
+cd dp-project-app
 go build -o dppm
 sudo cp dppm /usr/local/bin/
 ```

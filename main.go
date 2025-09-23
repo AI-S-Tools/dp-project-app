@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var version = "dev" // Will be set during build
+
 var rootCmd = &cobra.Command{
 	Use:   "dppm",
 	Short: "Dropbox Project Manager (DPPM)",
@@ -71,9 +73,22 @@ func init() {
 
 	// Add --wiki flag for direct search
 	rootCmd.Flags().String("wiki", "", "Search DPPM knowledge base (e.g. --wiki \"create task\")")
+
+	// Add version flag
+	rootCmd.Flags().BoolP("version", "v", false, "Show version information")
 }
 
 func main() {
+	// Check for version flag first
+	for _, arg := range os.Args {
+		if arg == "--version" || arg == "-v" {
+			fmt.Printf("DPPM (Dropbox Project Manager) %s\n", version)
+			fmt.Println("AI-first CLI tool for project, phase, and task management")
+			fmt.Println("Repository: https://github.com/AI-S-Tools/dp-project-app")
+			return
+		}
+	}
+
 	// Check for --wiki flag in args before executing
 	for i, arg := range os.Args {
 		if arg == "--wiki" && i+1 < len(os.Args) {

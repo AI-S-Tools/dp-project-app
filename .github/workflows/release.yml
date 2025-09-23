@@ -1,0 +1,244 @@
+name: Release Native Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          # Linux builds
+          - goos: linux
+            goarch: amd64
+            name: dppm-linux-amd64
+          - goos: linux
+            goarch: arm64
+            name: dppm-linux-arm64
+
+          # macOS builds
+          - goos: darwin
+            goarch: amd64
+            name: dppm-macos-amd64
+          - goos: darwin
+            goarch: arm64
+            name: dppm-macos-arm64
+
+          # Windows builds
+          - goos: windows
+            goarch: amd64
+            name: dppm-windows-amd64.exe
+          - goos: windows
+            goarch: arm64
+            name: dppm-windows-arm64.exe
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Get version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        CGO_ENABLED: 0
+      run: |
+        go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" -o ${{ matrix.name }}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.name }}
+        path: ${{ matrix.name }}
+
+  create-release:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Get version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Generate checksums
+      run: |
+        for dir in dppm-*; do
+          if [ -d "$dir" ]; then
+            cd "$dir"
+            for file in *; do
+              if [ -f "$file" ]; then
+                sha256sum "$file" >> ../checksums.txt
+                mv "$file" ../"$file"
+              fi
+            done
+            cd ..
+            rmdir "$dir"
+          fi
+        done
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        release_name: DPPM ${{ steps.version.outputs.VERSION }}
+        body: |
+          # DPPM ${{ steps.version.outputs.VERSION }}
+
+          ## 🚀 Dropbox Project Manager - AI-First CLI Tool
+
+          Native binaries for all major platforms. Download the appropriate binary for your system:
+
+          ### Installation
+
+          #### Linux / macOS
+          ```bash
+          # Download binary (replace with your platform)
+          wget https://github.com/AI-S-Tools/dp-project-app/releases/download/${{ steps.version.outputs.VERSION }}/dppm-linux-amd64
+
+          # Make executable and install
+          chmod +x dppm-linux-amd64
+          sudo mv dppm-linux-amd64 /usr/local/bin/dppm
+
+          # Verify installation
+          dppm wiki "getting started"
+          ```
+
+          #### Windows
+          ```powershell
+          # Download dppm-windows-amd64.exe
+          # Move to a directory in your PATH
+          # Run: dppm wiki "getting started"
+          ```
+
+          ### Platforms Supported
+          - **Linux**: amd64, arm64
+          - **macOS**: amd64 (Intel), arm64 (Apple Silicon)
+          - **Windows**: amd64, arm64
+
+          ### What's New
+          - Complete AI-friendly wiki system with 20+ guides
+          - Phase-based project organization
+          - Advanced dependency management
+          - Built-in comprehensive help system
+          - YAML-based storage with Dropbox sync
+
+          ### Getting Started
+          After installation, run:
+          ```bash
+          dppm                    # Smart startup guide
+          dppm wiki list          # See all available topics
+          dppm wiki "complete"    # Full workflow example
+          ```
+
+          ### Checksums
+          Verify your download with the checksums in `checksums.txt`.
+        draft: false
+        prerelease: false
+
+    - name: Upload Linux amd64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dppm-linux-amd64
+        asset_name: dppm-linux-amd64
+        asset_content_type: application/octet-stream
+
+    - name: Upload Linux arm64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dppm-linux-arm64
+        asset_name: dppm-linux-arm64
+        asset_content_type: application/octet-stream
+
+    - name: Upload macOS amd64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dppm-macos-amd64
+        asset_name: dppm-macos-amd64
+        asset_content_type: application/octet-stream
+
+    - name: Upload macOS arm64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dppm-macos-arm64
+        asset_name: dppm-macos-arm64
+        asset_content_type: application/octet-stream
+
+    - name: Upload Windows amd64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dppm-windows-amd64.exe
+        asset_name: dppm-windows-amd64.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload Windows arm64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dppm-windows-arm64.exe
+        asset_name: dppm-windows-arm64.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload checksums
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./checksums.txt
+        asset_name: checksums.txt
+        asset_content_type: text/plain
