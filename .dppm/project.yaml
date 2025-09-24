@@ -1,0 +1,11 @@
+binding:
+    project_id: test-manual
+    dropbox_path: /home/ubuntu/Dropbox/project-management/projects/test-manual
+    created: 2025-09-24T14:54:06.551506746Z
+    last_sync: 2025-09-24T14:54:06.551512015Z
+project:
+    id: test-manual
+    name: ""
+    status: active
+    owner: ""
+context: {}

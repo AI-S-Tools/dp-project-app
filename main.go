@@ -4,11 +4,39 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 var version = "dev" // Will be set during build
+
+// Local project binding structures
+type ProjectBinding struct {
+	ProjectID    string    `yaml:"project_id"`
+	DropboxPath  string    `yaml:"dropbox_path"`
+	Created      time.Time `yaml:"created"`
+	LastSync     time.Time `yaml:"last_sync"`
+}
+
+type LocalProjectConfig struct {
+	Binding ProjectBinding `yaml:"binding"`
+	Project struct {
+		ID     string `yaml:"id"`
+		Name   string `yaml:"name"`
+		Status string `yaml:"status"`
+		Owner  string `yaml:"owner"`
+	} `yaml:"project"`
+	Context struct {
+		CurrentPhase     string `yaml:"current_phase,omitempty"`
+		InProgressTask   string `yaml:"in_progress_task,omitempty"`
+		LastTaskCreated  string `yaml:"last_task_created,omitempty"`
+	} `yaml:"context"`
+}
+
+// Global variable to hold current project context
+var currentProjectConfig *LocalProjectConfig
 
 var rootCmd = &cobra.Command{
 	Use:   "dppm",
@@ -70,6 +98,7 @@ func init() {
 	projectsPath = filepath.Join(home, "Dropbox", "project-management")
 
 	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(bindCmd)
 	rootCmd.AddCommand(projectCmd)
 	rootCmd.AddCommand(phaseCmd)
 	rootCmd.AddCommand(taskCmd)
@@ -83,6 +112,179 @@ func init() {
 
 	// Add version flag
 	rootCmd.Flags().BoolP("version", "v", false, "Show version information")
+}
+
+// findProjectBinding searches for .dppm/project.yaml in current and parent directories
+func findProjectBinding() (string, error) {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	// Search upwards from current directory
+	dir := currentDir
+	for {
+		dppmPath := filepath.Join(dir, ".dppm", "project.yaml")
+		if _, err := os.Stat(dppmPath); err == nil {
+			return dppmPath, nil
+		}
+
+		parentDir := filepath.Dir(dir)
+		if parentDir == dir {
+			// Reached root directory
+			break
+		}
+		dir = parentDir
+	}
+
+	return "", fmt.Errorf("no .dppm/project.yaml found in current or parent directories")
+}
+
+// loadProjectConfig loads the local project configuration
+func loadProjectConfig(configPath string) (*LocalProjectConfig, error) {
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read project config: %v", err)
+	}
+
+	var config LocalProjectConfig
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("failed to parse project config: %v", err)
+	}
+
+	return &config, nil
+}
+
+// saveProjectConfig saves the local project configuration
+func saveProjectConfig(configPath string, config *LocalProjectConfig) error {
+	config.Binding.LastSync = time.Now()
+
+	data, err := yaml.Marshal(config)
+	if err != nil {
+		return fmt.Errorf("failed to marshal project config: %v", err)
+	}
+
+	// Ensure .dppm directory exists
+	if err := os.MkdirAll(filepath.Dir(configPath), 0755); err != nil {
+		return fmt.Errorf("failed to create .dppm directory: %v", err)
+	}
+
+	if err := os.WriteFile(configPath, data, 0644); err != nil {
+		return fmt.Errorf("failed to save project config: %v", err)
+	}
+
+	return nil
+}
+
+// getCurrentProjectID returns the current project ID from local binding
+func getCurrentProjectID() string {
+	if currentProjectConfig == nil {
+		return ""
+	}
+	return currentProjectConfig.Binding.ProjectID
+}
+
+// createProjectBinding creates a new .dppm/project.yaml in current directory
+func createProjectBinding(projectID string) error {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %v", err)
+	}
+
+	dppmDir := filepath.Join(currentDir, ".dppm")
+	configPath := filepath.Join(dppmDir, "project.yaml")
+
+	// Check if .dppm already exists
+	if _, err := os.Stat(configPath); err == nil {
+		return fmt.Errorf(".dppm/project.yaml already exists in this directory")
+	}
+
+	// Create the config
+	config := &LocalProjectConfig{
+		Binding: ProjectBinding{
+			ProjectID:   projectID,
+			DropboxPath: filepath.Join(projectsPath, "projects", projectID),
+			Created:     time.Now(),
+			LastSync:    time.Now(),
+		},
+		Project: struct {
+			ID     string `yaml:"id"`
+			Name   string `yaml:"name"`
+			Status string `yaml:"status"`
+			Owner  string `yaml:"owner"`
+		}{
+			ID:     projectID,
+			Name:   "", // Will be filled from Dropbox project
+			Status: "active",
+			Owner:  "",
+		},
+	}
+
+	if err := saveProjectConfig(configPath, config); err != nil {
+		return fmt.Errorf("failed to create project binding: %v", err)
+	}
+
+	fmt.Printf("✅ Created .dppm/project.yaml binding to project: %s\n", projectID)
+	fmt.Printf("📁 Directory: %s\n", currentDir)
+	fmt.Printf("🔗 Dropbox Path: %s\n", config.Binding.DropboxPath)
+
+	return nil
+}
+
+var bindCmd = &cobra.Command{
+	Use:   "bind [project-id]",
+	Short: "Bind current directory to an existing DPPM project",
+	Long: `Bind Current Directory to DPPM Project
+
+Creates a local .dppm/project.yaml file that binds the current directory
+to an existing DPPM project in your Dropbox. This enables automatic
+project scoping for all DPPM commands.
+
+Arguments:
+  project-id    ID of existing DPPM project to bind to
+
+Examples:
+  dppm bind dp-project-app     # Bind to existing project
+  dppm bind dash-terminal      # Bind to DASH Terminal project
+
+After binding, all DPPM commands will automatically use this project:
+  dppm task create feature     # Auto: --project dp-project-app
+  dppm phase create testing    # Auto: --project dp-project-app`,
+	Args: cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		projectID := args[0]
+
+		// Verify project exists in Dropbox
+		projectPath := filepath.Join(projectsPath, "projects", projectID, "project.yaml")
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "❌ Error: Project '%s' not found in Dropbox.\n", projectID)
+			fmt.Fprintf(os.Stderr, "Available projects:\n")
+			// TODO: List available projects
+			os.Exit(1)
+		}
+
+		// Create binding
+		if err := createProjectBinding(projectID); err != nil {
+			fmt.Fprintf(os.Stderr, "❌ Error: %v\n", err)
+			os.Exit(1)
+		}
+
+		fmt.Println("\n🎯 Project binding complete!")
+		fmt.Println("All DPPM commands in this directory will now use this project.")
+	},
+}
+
+// requireProjectBinding ensures we have a project binding or exits with error
+func requireProjectBinding() {
+	if currentProjectConfig == nil {
+		fmt.Fprintf(os.Stderr, "❌ Error: No DPPM project found in current directory.\n\n")
+		fmt.Fprintf(os.Stderr, "To initialize a new project:\n")
+		fmt.Fprintf(os.Stderr, "  dppm init project-name --name \"Project Name\"\n\n")
+		fmt.Fprintf(os.Stderr, "To bind to an existing project:\n")
+		fmt.Fprintf(os.Stderr, "  dppm bind existing-project-id\n\n")
+		fmt.Fprintf(os.Stderr, "This prevents accidental cross-project task creation.\n")
+		os.Exit(1)
+	}
 }
 
 func main() {
@@ -104,6 +306,59 @@ func main() {
 			wikiCmd.Run(wikiCmd, []string{wikiQuery})
 			return
 		}
+	}
+
+	// Special commands that don't require project binding
+	if len(os.Args) > 1 {
+		command := os.Args[1]
+		if command == "init" || command == "bind" || command == "wiki" || command == "--help" || command == "help" {
+			if err := rootCmd.Execute(); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+			return
+		}
+	}
+
+	// Try to find and load project binding
+	configPath, err := findProjectBinding()
+	if err != nil {
+		// No project binding found - show error and suggest init/bind
+		if len(os.Args) == 1 {
+			// No arguments - show startup guide which now suggests init
+			showStartupGuide()
+			return
+		} else {
+			// Command was provided but no project binding
+			fmt.Fprintf(os.Stderr, "❌ Error: No DPPM project found in current directory.\n\n")
+			fmt.Fprintf(os.Stderr, "To initialize a new project:\n")
+			fmt.Fprintf(os.Stderr, "  dppm init project-name --name \"Project Name\"\n\n")
+			fmt.Fprintf(os.Stderr, "To bind to an existing project:\n")
+			fmt.Fprintf(os.Stderr, "  dppm bind existing-project-id\n\n")
+			fmt.Fprintf(os.Stderr, "This prevents accidental cross-project task creation.\n")
+			os.Exit(1)
+		}
+	}
+
+	// Load project configuration
+	currentProjectConfig, err = loadProjectConfig(configPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "❌ Error loading project config: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Show current project context
+	if len(os.Args) == 1 {
+		// No arguments - show project-aware status
+		fmt.Printf("🎯 Current DPPM Project: %s\n", currentProjectConfig.Project.Name)
+		fmt.Printf("📁 Project ID: %s\n", currentProjectConfig.Binding.ProjectID)
+		fmt.Printf("📊 Directory: %s\n\n", filepath.Dir(filepath.Dir(configPath)))
+
+		// Show project status
+		if statusCmd.Run != nil {
+			statusCmd.Run(statusCmd, []string{"project", currentProjectConfig.Binding.ProjectID})
+		}
+		return
 	}
 
 	if err := rootCmd.Execute(); err != nil {

@@ -98,6 +98,17 @@ Examples:
 		startDate, _ := cmd.Flags().GetString("start-date")
 		endDate, _ := cmd.Flags().GetString("end-date")
 
+		// Use current project from local binding if no project specified
+		if projectID == "" {
+			projectID = getCurrentProjectID()
+			if projectID == "" {
+				fmt.Fprintf(os.Stderr, "❌ Error: No project specified and no local project binding found.\n")
+				fmt.Fprintf(os.Stderr, "Run 'dppm init' to create project binding.\n")
+				os.Exit(1)
+			}
+			fmt.Printf("🎯 Using current project: %s\n", projectID)
+		}
+
 		if name == "" {
 			name = phaseID
 		}
