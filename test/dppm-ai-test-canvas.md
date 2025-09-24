@@ -328,8 +328,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Create task without required fields
 
 **Expected:** Helpful error messages
-**Current Status:** ⚠️ MIXED
+**Current Status:** ❌ FAIL
 **Success Criteria:** Clear, actionable errors
+**AI Notes:** The application fails to handle any of the tested error conditions. It allows the creation of projects with empty IDs, duplicate projects, and tasks without required fields. It also doesn't fail when referencing a non-existent project, but creates it instead. The error handling is fundamentally broken.
 
 ### Q9.2: Recovery from failed operations
 **Test Steps:**
@@ -341,6 +342,7 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 **Expected:** Graceful recovery
 **Current Status:** ❓ UNTESTED
 **Success Criteria:** No data loss
+**AI Notes:** These test steps require manual intervention (interrupting a process, corrupting a file) that cannot be reliably automated in this environment. This test should be performed manually.
 
 ---
 
@@ -355,8 +357,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Verify under 2-second response
 
 **Expected:** Performance acceptable
-**Current Status:** ❓ UNTESTED
+**Current Status:** ❓ BLOCKED
 **Success Criteria:** All operations < 2 seconds
+**AI Notes:** This test is blocked because Q3.1 failed. It's impossible to test performance on a large project with dependencies without being able to create tasks with dependencies.
 
 ---
 
