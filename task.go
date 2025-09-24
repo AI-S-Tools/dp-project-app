@@ -11,31 +11,31 @@ import (
 )
 
 type Task struct {
-	ID          string            `yaml:"id"`
-	Title       string            `yaml:"title"`
-	ProjectID   string            `yaml:"project_id"`
-	PhaseID     string            `yaml:"phase_id,omitempty"`
-	Status      string            `yaml:"status"`
-	Priority    string            `yaml:"priority"`
-	Assignee    string            `yaml:"assignee,omitempty"`
-	Reporter    string            `yaml:"reporter,omitempty"`
-	Created     string            `yaml:"created"`
-	Updated     string            `yaml:"updated"`
-	DueDate     string            `yaml:"due_date,omitempty"`
-	StoryPoints int               `yaml:"story_points,omitempty"`
-	Description string            `yaml:"description"`
+	ID          string `yaml:"id"`
+	Title       string `yaml:"title"`
+	ProjectID   string `yaml:"project_id"`
+	PhaseID     string `yaml:"phase_id,omitempty"`
+	Status      string `yaml:"status"`
+	Priority    string `yaml:"priority"`
+	Assignee    string `yaml:"assignee,omitempty"`
+	Reporter    string `yaml:"reporter,omitempty"`
+	Created     string `yaml:"created"`
+	Updated     string `yaml:"updated"`
+	DueDate     string `yaml:"due_date,omitempty"`
+	StoryPoints int    `yaml:"story_points,omitempty"`
+	Description string `yaml:"description"`
 
 	// Advanced features
-	Components    []Component       `yaml:"components,omitempty"`
-	Issues        []Issue           `yaml:"issues,omitempty"`
-	DependencyIDs []string          `yaml:"dependency_ids,omitempty"`
-	BlockedBy     []string          `yaml:"blocked_by,omitempty"`
-	Blocking      []string          `yaml:"blocking,omitempty"`
-	Labels        []string          `yaml:"labels,omitempty"`
-	Attachments   []string          `yaml:"attachments,omitempty"`
-	Comments      []Comment         `yaml:"comments,omitempty"`
-	TimeTracking  TimeTracking      `yaml:"time_tracking,omitempty"`
-	Progress      Progress          `yaml:"progress,omitempty"`
+	Components    []Component  `yaml:"components,omitempty"`
+	Issues        []Issue      `yaml:"issues,omitempty"`
+	DependencyIDs []string     `yaml:"dependency_ids,omitempty"`
+	BlockedBy     []string     `yaml:"blocked_by,omitempty"`
+	Blocking      []string     `yaml:"blocking,omitempty"`
+	Labels        []string     `yaml:"labels,omitempty"`
+	Attachments   []string     `yaml:"attachments,omitempty"`
+	Comments      []Comment    `yaml:"comments,omitempty"`
+	TimeTracking  TimeTracking `yaml:"time_tracking,omitempty"`
+	Progress      Progress     `yaml:"progress,omitempty"`
 }
 
 type Component struct {
@@ -77,16 +77,16 @@ type TimeTracking struct {
 }
 
 type TimeLog struct {
-	Date        string `yaml:"date"`
+	Date        string  `yaml:"date"`
 	Hours       float32 `yaml:"hours"`
-	Description string `yaml:"description"`
-	Author      string `yaml:"author"`
+	Description string  `yaml:"description"`
+	Author      string  `yaml:"author"`
 }
 
 type Progress struct {
-	TotalComponents       int `yaml:"total_components"`
-	CompletedComponents   int `yaml:"completed_components"`
-	CompletionPercentage  int `yaml:"completion_percentage"`
+	TotalComponents      int `yaml:"total_components"`
+	CompletedComponents  int `yaml:"completed_components"`
+	CompletionPercentage int `yaml:"completion_percentage"`
 	TotalIssues          int `yaml:"total_issues"`
 	ResolvedIssues       int `yaml:"resolved_issues"`
 	OpenBugs             int `yaml:"open_bugs"`
@@ -140,7 +140,7 @@ Examples:
 💡 AI Best Practice:
   Always include descriptions for better task context and collaboration.
   Descriptions help other AI agents understand task requirements and scope.`,
-	Args:  cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		taskID := args[0]
 		title, _ := cmd.Flags().GetString("title")
@@ -166,24 +166,24 @@ Examples:
 		}
 
 		task := Task{
-			ID:          taskID,
-			Title:       title,
-			ProjectID:   projectID,
-			PhaseID:     phaseID,
-			Status:      "todo",
-			Priority:    priority,
-			Assignee:    assignee,
-			Reporter:    "dppm-user",
-			Created:     time.Now().Format("2006-01-02"),
-			Updated:     time.Now().Format("2006-01-02"),
-			Description: description,
-			Components:  []Component{},
-			Issues:      []Issue{},
+			ID:            taskID,
+			Title:         title,
+			ProjectID:     projectID,
+			PhaseID:       phaseID,
+			Status:        "todo",
+			Priority:      priority,
+			Assignee:      assignee,
+			Reporter:      "dppm-user",
+			Created:       time.Now().Format("2006-01-02"),
+			Updated:       time.Now().Format("2006-01-02"),
+			Description:   description,
+			Components:    []Component{},
+			Issues:        []Issue{},
 			DependencyIDs: []string{},
-			BlockedBy:   []string{},
-			Blocking:    []string{},
-			Labels:      []string{},
-			Comments:    []Comment{},
+			BlockedBy:     []string{},
+			Blocking:      []string{},
+			Labels:        []string{},
+			Comments:      []Comment{},
 		}
 
 		// Create task directory structure

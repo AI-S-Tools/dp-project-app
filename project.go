@@ -11,19 +11,19 @@ import (
 )
 
 type Project struct {
-	ID          string            `yaml:"id"`
-	Name        string            `yaml:"name"`
-	Description string            `yaml:"description"`
-	Status      string            `yaml:"status"`
-	Owner       string            `yaml:"owner"`
-	Created     string            `yaml:"created"`
-	Updated     string            `yaml:"updated"`
-	Repository  string            `yaml:"repository,omitempty"`
-	Tags        []string          `yaml:"tags,omitempty"`
-	Metadata    map[string]interface{} `yaml:"metadata,omitempty"`
-	Notes       string            `yaml:"notes,omitempty"`
-	CurrentPhase string          `yaml:"current_phase,omitempty"`
-	Phases     []string          `yaml:"phases,omitempty"`
+	ID           string                 `yaml:"id"`
+	Name         string                 `yaml:"name"`
+	Description  string                 `yaml:"description"`
+	Status       string                 `yaml:"status"`
+	Owner        string                 `yaml:"owner"`
+	Created      string                 `yaml:"created"`
+	Updated      string                 `yaml:"updated"`
+	Repository   string                 `yaml:"repository,omitempty"`
+	Tags         []string               `yaml:"tags,omitempty"`
+	Metadata     map[string]interface{} `yaml:"metadata,omitempty"`
+	Notes        string                 `yaml:"notes,omitempty"`
+	CurrentPhase string                 `yaml:"current_phase,omitempty"`
+	Phases       []string               `yaml:"phases,omitempty"`
 }
 
 var projectCmd = &cobra.Command{
@@ -90,7 +90,7 @@ AI Usage Tips:
   - Use descriptive project names for better organization
   - Include clear descriptions for AI context understanding
   - Set appropriate owners for team collaboration`,
-	Args:  cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		projectID := args[0]
 		name, _ := cmd.Flags().GetString("name")
@@ -118,7 +118,7 @@ AI Usage Tips:
 			Created:     time.Now().Format("2006-01-02"),
 			Updated:     time.Now().Format("2006-01-02"),
 			Tags:        []string{},
-			Phases:     []string{},
+			Phases:      []string{},
 		}
 
 		projectDir := filepath.Join(projectsPath, "projects", projectID)

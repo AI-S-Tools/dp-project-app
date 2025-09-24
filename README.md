@@ -43,14 +43,32 @@ This script automatically:
 
 Download the latest binary for your platform from [Releases](https://github.com/AI-S-Tools/dp-project-app/releases):
 
-#### Linux / macOS
+#### Linux
 ```bash
-# Download binary (replace with your platform)
-curl -L -o dppm-linux-amd64 https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-amd64
+# Download binary (choose your architecture: amd64 or arm64)
+wget https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-amd64
+# OR for ARM:
+# wget https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-arm64
 
 # Make executable and install
 chmod +x dppm-linux-amd64
 sudo mv dppm-linux-amd64 /usr/local/bin/dppm
+
+# Verify installation
+dppm --version
+dppm wiki "getting started"
+```
+
+#### macOS
+```bash
+# For Intel Macs:
+curl -L -o dppm https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-macos-amd64
+# For Apple Silicon (M1/M2/M3):
+# curl -L -o dppm https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-macos-arm64
+
+# Make executable and install
+chmod +x dppm
+sudo mv dppm /usr/local/bin/dppm
 
 # Verify installation
 dppm --version

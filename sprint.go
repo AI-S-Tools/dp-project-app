@@ -11,26 +11,26 @@ import (
 )
 
 type Phase struct {
-	ID          string            `yaml:"id"`
-	Name        string            `yaml:"name"`
-	ProjectID   string            `yaml:"project_id"`
-	Status      string            `yaml:"status"`
-	StartDate   string            `yaml:"start_date,omitempty"`
-	EndDate     string            `yaml:"end_date,omitempty"`
-	Created     string            `yaml:"created"`
-	Updated     string            `yaml:"updated"`
-	Goal        string            `yaml:"goal,omitempty"`
-	Capacity    int               `yaml:"capacity,omitempty"`
-	Tasks       []string          `yaml:"tasks,omitempty"`
-	Metrics     PhaseMetrics      `yaml:"metrics,omitempty"`
-	Notes       string            `yaml:"notes,omitempty"`
+	ID        string       `yaml:"id"`
+	Name      string       `yaml:"name"`
+	ProjectID string       `yaml:"project_id"`
+	Status    string       `yaml:"status"`
+	StartDate string       `yaml:"start_date,omitempty"`
+	EndDate   string       `yaml:"end_date,omitempty"`
+	Created   string       `yaml:"created"`
+	Updated   string       `yaml:"updated"`
+	Goal      string       `yaml:"goal,omitempty"`
+	Capacity  int          `yaml:"capacity,omitempty"`
+	Tasks     []string     `yaml:"tasks,omitempty"`
+	Metrics   PhaseMetrics `yaml:"metrics,omitempty"`
+	Notes     string       `yaml:"notes,omitempty"`
 }
 
 type PhaseMetrics struct {
-	CompletedTasks     int `yaml:"completed_tasks"`
-	TotalTasks         int `yaml:"total_tasks"`
+	CompletedTasks       int `yaml:"completed_tasks"`
+	TotalTasks           int `yaml:"total_tasks"`
 	StoryPointsCompleted int `yaml:"story_points_completed"`
-	StoryPointsTotal   int `yaml:"story_points_total"`
+	StoryPointsTotal     int `yaml:"story_points_total"`
 }
 
 var phaseCmd = &cobra.Command{
@@ -89,7 +89,7 @@ Phase Status Values:
 Examples:
   dppm phase create phase-3 --project dash-lxd --name "File Integration"
   dppm phase create backend-v2 --project web-app --name "Backend Version 2" --goal "Complete API redesign"`,
-	Args:  cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		phaseID := args[0]
 		name, _ := cmd.Flags().GetString("name")

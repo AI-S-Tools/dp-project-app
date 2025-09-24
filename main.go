@@ -128,7 +128,12 @@ func showStartupGuide() {
   dppm list projects           # See existing projects
   dppm status                  # Check overall status
 
-🚀 CREATE NEW PROJECT:
+🚀 CREATE NEW PROJECT (Two Options):
+
+Option 1 - Complete Initialization (Recommended):
+  dppm init my-project         # Interactive project setup wizard
+
+Option 2 - Manual Creation:
   dppm project create my-project --name "My Project" --owner "your-name"
   dppm phase create phase-1 --project my-project --name "First Phase"
   dppm task create first-task --project my-project --phase phase-1
