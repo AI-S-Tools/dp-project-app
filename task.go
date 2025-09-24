@@ -160,6 +160,7 @@ Examples:
 		description, _ := cmd.Flags().GetString("description")
 		priority, _ := cmd.Flags().GetString("priority")
 		assignee, _ := cmd.Flags().GetString("assignee")
+		dependencyIdsStr, _ := cmd.Flags().GetString("dependency-ids")
 
 		// Use current project from local binding if no project specified
 		if projectID == "" {
@@ -187,6 +188,16 @@ Examples:
 			fmt.Println()
 		}
 
+		// Process dependency IDs
+		var dependencyIDs []string
+		if dependencyIdsStr != "" {
+			dependencyIDs = strings.Split(dependencyIdsStr, ",")
+			// Trim whitespace from each ID
+			for i, id := range dependencyIDs {
+				dependencyIDs[i] = strings.TrimSpace(id)
+			}
+		}
+
 		task := Task{
 			ID:            taskID,
 			Title:         title,
@@ -201,7 +212,7 @@ Examples:
 			Description:   description,
 			Components:    []Component{},
 			Issues:        []Issue{},
-			DependencyIDs: []string{},
+			DependencyIDs: dependencyIDs,
 			BlockedBy:     []string{},
 			Blocking:      []string{},
 			Labels:        []string{},
@@ -575,6 +586,7 @@ func init() {
 	createTaskCmd.Flags().StringP("description", "d", "", "Task description")
 	createTaskCmd.Flags().String("priority", "medium", "Task priority (low, medium, high, critical)")
 	createTaskCmd.Flags().StringP("assignee", "a", "", "Task assignee")
+	createTaskCmd.Flags().String("dependency-ids", "", "Comma-separated list of task IDs this task depends on")
 
 	createTaskCmd.MarkFlagRequired("project")
 
