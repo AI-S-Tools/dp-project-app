@@ -175,6 +175,24 @@ func searchWiki(searchTerm string) {
 		showAIWorkflowGuide()
 	case strings.Contains(searchLower, "ai collaboration") || strings.Contains(searchLower, "dsl markers"):
 		showAICollaborationGuide()
+	case strings.Contains(searchLower, "best practices") || strings.Contains(searchLower, "recommended patterns"):
+		showBestPracticesGuide()
+	case strings.Contains(searchLower, "task components") || strings.Contains(searchLower, "breaking tasks"):
+		showTaskComponentsGuide()
+	case strings.Contains(searchLower, "time tracking") || strings.Contains(searchLower, "time logging"):
+		showTimeTrackingGuide()
+	case strings.Contains(searchLower, "issue tracking") || strings.Contains(searchLower, "bug management"):
+		showIssueTrackingGuide()
+	case strings.Contains(searchLower, "project templates") || strings.Contains(searchLower, "templates"):
+		showProjectTemplatesGuide()
+	case strings.Contains(searchLower, "collaboration") && !strings.Contains(searchLower, "ai"):
+		showCollaborationGuide()
+	case strings.Contains(searchLower, "automation") || strings.Contains(searchLower, "scripting"):
+		showAutomationGuide()
+	case strings.Contains(searchLower, "troubleshooting") || strings.Contains(searchLower, "common issues"):
+		showTroubleshootingGuide()
+	case strings.Contains(searchLower, "real world") || strings.Contains(searchLower, "practical usage"):
+		showRealWorldGuide()
 	default:
 		fmt.Printf("No specific guide found for '%s'\n\n", searchTerm)
 		fmt.Println("Try one of these common searches:")
