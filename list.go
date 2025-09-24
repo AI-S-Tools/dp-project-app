@@ -201,10 +201,52 @@ Flags:
 	},
 }
 
+// /* Definerer 'active' underkommandoen for at liste aktive opgaver. */
+var listActiveCmd = &cobra.Command{
+	Use:   "active",
+	Short: "List active tasks that can be worked on",
+	Long: `List Active Tasks
+
+Display all active tasks across projects that are not blocked by
+dependencies and can be worked on immediately. This provides a
+quick overview of available work items.
+
+Active tasks are those that:
+  • Have status 'todo' or 'in_progress'
+  • Are not blocked by incomplete dependencies
+  • Are ready for immediate work
+
+Information Displayed:
+  • Task ID and title
+  • Project and phase information
+  • Current status and priority
+  • Assignee information (if any)
+  • Last updated timestamp
+
+Examples:
+  dppm list active                    # List all active tasks across projects
+  dppm list active --project web-app # List active tasks for specific project
+
+AI Usage:
+  Ideal for quick status checks and identifying immediately
+  actionable work items across your project portfolio.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		projectID, _ := cmd.Flags().GetString("project")
+
+		if projectID != "" {
+			showActiveTasksForProject(projectID)
+		} else {
+			showAllActiveTasks()
+		}
+	},
+}
+
 // /* Initialiserer 'list' kommandoen og dens underkommandoer. */
 func init() {
 	listPhasesCmd.Flags().StringP("project", "p", "", "Project ID")
+	listActiveCmd.Flags().StringP("project", "p", "", "Project ID")
 
 	listCmd.AddCommand(listProjectsCmd)
 	listCmd.AddCommand(listPhasesCmd)
+	listCmd.AddCommand(listActiveCmd)
 }

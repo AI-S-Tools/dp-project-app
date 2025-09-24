@@ -336,12 +336,265 @@ func showAllDependencies() {
 	}
 }
 
+// /* Definerer 'active' underkommandoen for at vise aktive opgaver. */
+var statusActiveCmd = &cobra.Command{
+	Use:   "active",
+	Short: "Show tasks that can be worked on now",
+	Long: `Show Active Tasks
+
+Display all tasks that are not blocked by dependencies and can be
+worked on immediately. This shows tasks that are available for
+team members to pick up and start working on.
+
+Tasks are considered active when:
+  • Status is 'todo' or 'in_progress'
+  • No blocking dependencies exist
+  • All dependency tasks are completed
+
+Information Displayed:
+  • Task ID and title
+  • Project and phase information
+  • Priority level
+  • Assignee (if any)
+  • Last updated timestamp
+
+Examples:
+  dppm status active                    # Show all active tasks across projects
+  dppm status active --project web-app # Show active tasks for specific project
+
+AI Usage:
+  Perfect for daily standups and sprint planning to see what work
+  is immediately available for team members.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		projectID, _ := cmd.Flags().GetString("project")
+
+		if projectID != "" {
+			showActiveTasksForProject(projectID)
+		} else {
+			showAllActiveTasks()
+		}
+	},
+}
+
+// /* Viser aktive opgaver for et specifikt projekt. */
+func showActiveTasksForProject(projectID string) {
+	fmt.Printf("Active Tasks for project: %s\n", projectID)
+	fmt.Println("==============================")
+
+	projectDir := filepath.Join(projectsPath, "projects", projectID)
+	if !dirExists(projectDir) {
+		fmt.Printf("❌ Project '%s' not found\n", projectID)
+		return
+	}
+
+	found := false
+	// Check tasks in project root
+	tasksDir := filepath.Join(projectDir, "tasks")
+	if dirExists(tasksDir) {
+		found = scanActiveTasksInDir(tasksDir, projectID, "") || found
+	}
+
+	// Check tasks in phases
+	phasesDir := filepath.Join(projectDir, "phases")
+	if dirExists(phasesDir) {
+		phases, err := os.ReadDir(phasesDir)
+		if err == nil {
+			for _, phase := range phases {
+				if phase.IsDir() {
+					phaseTasksDir := filepath.Join(phasesDir, phase.Name(), "tasks")
+					if dirExists(phaseTasksDir) {
+						found = scanActiveTasksInDir(phaseTasksDir, projectID, phase.Name()) || found
+					}
+				}
+			}
+		}
+	}
+
+	if !found {
+		fmt.Println("No active tasks found.")
+	}
+}
+
+// /* Viser alle aktive opgaver på tværs af alle projekter. */
+func showAllActiveTasks() {
+	fmt.Println("All Active Tasks")
+	fmt.Println("================")
+
+	projectsDir := filepath.Join(projectsPath, "projects")
+	projects, err := os.ReadDir(projectsDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading projects directory: %v\n", err)
+		return
+	}
+
+	found := false
+	for _, project := range projects {
+		if project.IsDir() {
+			projectID := project.Name()
+			fmt.Printf("\n📁 Project: %s\n", projectID)
+			fmt.Println(strings.Repeat("-", len(projectID)+12))
+
+			projectFound := false
+			// Check tasks in project root
+			tasksDir := filepath.Join(projectsDir, projectID, "tasks")
+			if dirExists(tasksDir) {
+				projectFound = scanActiveTasksInDir(tasksDir, projectID, "") || projectFound
+			}
+
+			// Check tasks in phases
+			phasesDir := filepath.Join(projectsDir, projectID, "phases")
+			if dirExists(phasesDir) {
+				phases, phErr := os.ReadDir(phasesDir)
+				if phErr == nil {
+					for _, phase := range phases {
+						if phase.IsDir() {
+							phaseTasksDir := filepath.Join(phasesDir, phase.Name(), "tasks")
+							if dirExists(phaseTasksDir) {
+								projectFound = scanActiveTasksInDir(phaseTasksDir, projectID, phase.Name()) || projectFound
+							}
+						}
+					}
+				}
+			}
+
+			if !projectFound {
+				fmt.Println("  No active tasks found")
+			}
+			found = found || projectFound
+		}
+	}
+
+	if !found {
+		fmt.Println("No active tasks found across all projects.")
+	}
+}
+
+// /* Scanner aktive opgaver i en given mappe. */
+func scanActiveTasksInDir(tasksDir, projectID, phaseID string) bool {
+	entries, err := os.ReadDir(tasksDir)
+	if err != nil {
+		return false
+	}
+
+	found := false
+	for _, entry := range entries {
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".yaml") {
+			taskFile := filepath.Join(tasksDir, entry.Name())
+			data, err := os.ReadFile(taskFile)
+			if err != nil {
+				continue
+			}
+
+			var task Task
+			if err := yaml.Unmarshal(data, &task); err != nil {
+				continue
+			}
+
+			// Check if task is active (not blocked and in workable state)
+			if isTaskActive(task) {
+				displayActiveTask(task, phaseID)
+				found = true
+			}
+		}
+	}
+	return found
+}
+
+// /* Kontrollerer om en opgave er aktiv (ikke blokeret og kan arbejdes på). */
+func isTaskActive(task Task) bool {
+	// Must be in a workable status
+	if task.Status != "todo" && task.Status != "in_progress" {
+		return false
+	}
+
+	// Must not be blocked by dependencies
+	for _, depID := range task.DependencyIDs {
+		if !isTaskCompleted(depID, task.ProjectID) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// /* Kontrollerer om en opgave er færdig. */
+func isTaskCompleted(taskID, projectID string) bool {
+	// Check in project root tasks
+	taskFile := filepath.Join(projectsPath, "projects", projectID, "tasks", taskID+".yaml")
+	if fileExists(taskFile) {
+		if task := loadTask(taskFile); task != nil {
+			return task.Status == "done" || task.Status == "completed"
+		}
+	}
+
+	// Check in phases
+	phasesDir := filepath.Join(projectsPath, "projects", projectID, "phases")
+	if dirExists(phasesDir) {
+		phases, err := os.ReadDir(phasesDir)
+		if err == nil {
+			for _, phase := range phases {
+				if phase.IsDir() {
+					taskFile := filepath.Join(phasesDir, phase.Name(), "tasks", taskID+".yaml")
+					if fileExists(taskFile) {
+						if task := loadTask(taskFile); task != nil {
+							return task.Status == "done" || task.Status == "completed"
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// /* Indlæser en opgave fra en YAML-fil. */
+func loadTask(taskFile string) *Task {
+	data, err := os.ReadFile(taskFile)
+	if err != nil {
+		return nil
+	}
+
+	var task Task
+	if err := yaml.Unmarshal(data, &task); err != nil {
+		return nil
+	}
+	return &task
+}
+
+// /* Viser en aktiv opgave. */
+func displayActiveTask(task Task, phaseID string) {
+	fmt.Printf("  ID: %s\n", task.ID)
+	fmt.Printf("  Title: %s\n", task.Title)
+	if phaseID != "" {
+		fmt.Printf("  Phase: %s\n", phaseID)
+	}
+	fmt.Printf("  Status: %s\n", task.Status)
+	fmt.Printf("  Priority: %s\n", task.Priority)
+	if task.Assignee != "" {
+		fmt.Printf("  Assignee: %s\n", task.Assignee)
+	}
+	fmt.Printf("  Updated: %s\n", task.Updated)
+	fmt.Println("  ---")
+}
+
+// /* Kontrollerer om en mappe eksisterer. */
+func dirExists(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return info.IsDir()
+}
+
 // /* Initialiserer 'status' kommandoen og dens underkommandoer. */
 func init() {
 	statusBlockedCmd.Flags().StringP("project", "p", "", "Show blocked tasks for specific project")
 	statusDependenciesCmd.Flags().StringP("project", "p", "", "Show dependencies for specific project")
+	statusActiveCmd.Flags().StringP("project", "p", "", "Show active tasks for specific project")
 
 	statusCmd.AddCommand(statusProjectCmd)
 	statusCmd.AddCommand(statusBlockedCmd)
 	statusCmd.AddCommand(statusDependenciesCmd)
+	statusCmd.AddCommand(statusActiveCmd)
 }
