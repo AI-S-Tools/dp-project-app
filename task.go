@@ -593,5 +593,5 @@ func init() {
 
 	taskCmd.AddCommand(createTaskCmd)
 	taskCmd.AddCommand(showTaskCmd)
-	ttaskCmd.AddCommand(updateTaskCmd)
+	taskCmd.AddCommand(updateTaskCmd)
 }

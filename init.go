@@ -135,7 +135,7 @@ AI Integration:
 // /* Opretter et DPPM-projekt ved at kalde 'dppm-test' kommandoen. */
 func createDPPMProject(projectID, projectName, docPath string) error {
 	// Use the existing project create command
-	cmd := exec.Command("./dppm-test", "project", "create", projectID, "--name", projectName)
+	cmd := exec.Command("dppm", "project", "create", projectID, "--name", projectName)
 	if docPath != "" {
 		// If we have doc path, use it as description context
 		cmd.Args = append(cmd.Args, "--description", fmt.Sprintf("Project initialized from %s", docPath))
@@ -230,7 +230,7 @@ func analyzeAndCreateStructure(projectID, docPath, template string) {
 		phaseID := fmt.Sprintf("phase-%d", i+1)
 		fmt.Printf("   Creating phase: %s\n", phase)
 
-		cmd := exec.Command("./dppm-test", "phase", "create", phaseID,
+		cmd := exec.Command("dppm", "phase", "create", phaseID,
 			"--project", projectID,
 			"--name", phase,
 			"--goal", fmt.Sprintf("Complete %s development", phase))
@@ -252,7 +252,7 @@ func createDefaultStructure(projectID, template string) {
 		phaseID := fmt.Sprintf("phase-%d", i+1)
 		fmt.Printf("   Creating phase: %s\n", phase)
 
-		cmd := exec.Command("./dppm-test", "phase", "create", phaseID,
+		cmd := exec.Command("dppm", "phase", "create", phaseID,
 			"--project", projectID,
 			"--name", phase,
 			"--goal", fmt.Sprintf("Complete %s phase", phase))
@@ -285,7 +285,7 @@ func analyzeProjectPhases(content, template string) []string {
 	}
 
 	// Template-specific adjustments
-	sswitch template {
+	switch template {
 	case "web":
 		phases = []string{"Setup", "Backend", "Frontend", "Integration", "Deployment"}
 	case "api":
@@ -299,7 +299,7 @@ func analyzeProjectPhases(content, template string) []string {
 
 // /* Returnerer en liste over standardfaser for en given skabelon. */
 func getDefaultPhases(template string) []string {
-	sswitch template {
+	switch template {
 	case "web":
 		return []string{"Setup", "Backend", "Frontend", "Integration"}
 	case "api":
