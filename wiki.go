@@ -194,12 +194,21 @@ func searchWiki(searchTerm string) {
 	case strings.Contains(searchLower, "real world") || strings.Contains(searchLower, "practical usage"):
 		showRealWorldGuide()
 	default:
-		fmt.Printf("No specific guide found for '%s'\n\n", searchTerm)
-		fmt.Println("Try one of these common searches:")
-		fmt.Println("  dppm wiki \"project types\"")
-		fmt.Println("  dppm wiki \"active tasks\"")
-		fmt.Println("  dppm wiki \"dependency order\"")
-		fmt.Println("  dppm wiki list")
+		// Try fuzzy matching
+		suggestions := findFuzzyMatches(searchLower)
+		if len(suggestions) > 0 {
+			fmt.Printf("No exact match found for '%s'. Did you mean:\n\n", searchTerm)
+			for _, suggestion := range suggestions {
+				fmt.Printf("  dppm wiki \"%s\"\n", suggestion)
+			}
+		} else {
+			fmt.Printf("No specific guide found for '%s'\n\n", searchTerm)
+			fmt.Println("Try one of these common searches:")
+			fmt.Println("  dppm wiki \"project types\"")
+			fmt.Println("  dppm wiki \"active tasks\"")
+			fmt.Println("  dppm wiki \"dependency order\"")
+			fmt.Println("  dppm wiki list")
+		}
 	}
 }
 
@@ -2397,6 +2406,103 @@ Quality Assurance:
   • Include testing in every phase
   • Define clear acceptance criteria
   • Track defect discovery rates`)
+}
+
+// /* Finder fuzzy matches for wiki søgninger. */
+func findFuzzyMatches(searchTerm string) []string {
+	// Define all available topics with their search keywords
+	topics := map[string][]string{
+		"what is dppm": {"dppm", "introduction", "overview", "about"},
+		"getting started": {"start", "begin", "quick", "setup", "init"},
+		"create project": {"create", "project", "new", "make"},
+		"project types": {"types", "phase-based", "task-based", "structure"},
+		"create phase": {"create", "phase", "sprint", "milestone"},
+		"create task": {"create", "task", "new", "add"},
+		"task dependencies": {"dependencies", "dependency", "depend", "block"},
+		"task workflow": {"workflow", "process", "lifecycle"},
+		"task components": {"components", "parts", "break", "divide"},
+		"active tasks": {"active", "current", "progress", "working"},
+		"active phases": {"active", "current", "phases", "sprint"},
+		"dependency order": {"order", "sequence", "dependencies", "chain"},
+		"status commands": {"status", "report", "check"},
+		"blocked tasks": {"blocked", "blocking", "stuck"},
+		"dependency chains": {"chains", "dependencies", "graph"},
+		"find task": {"find", "search", "locate"},
+		"list active": {"list", "active", "show"},
+		"project structure": {"structure", "organization", "layout"},
+		"project workflow": {"workflow", "process", "management"},
+		"build project": {"build", "compile", "deploy"},
+		"ai workflow": {"ai", "artificial", "intelligence"},
+		"ai collaboration": {"ai", "collaboration", "dsl", "markers"},
+		"best practices": {"best", "practices", "tips", "recommended"},
+		"time tracking": {"time", "tracking", "hours", "estimate"},
+		"issue tracking": {"issue", "bug", "problem", "defect"},
+		"project templates": {"templates", "template", "scaffold"},
+		"collaboration": {"collaboration", "team", "working"},
+		"automation": {"automation", "scripting", "ci", "cd"},
+		"troubleshooting": {"troubleshooting", "problems", "issues", "help"},
+		"real world": {"real", "world", "practical", "examples"},
+		"complete": {"complete", "full", "example", "tutorial"},
+	}
+
+	var matches []string
+	searchWords := strings.Fields(searchTerm)
+
+	// Find topics that match any search word
+	for topic, keywords := range topics {
+		for _, searchWord := range searchWords {
+			for _, keyword := range keywords {
+				if strings.Contains(keyword, searchWord) || strings.Contains(searchWord, keyword) {
+					// Avoid duplicates
+					found := false
+					for _, existing := range matches {
+						if existing == topic {
+							found = true
+							break
+						}
+					}
+					if !found {
+						matches = append(matches, topic)
+					}
+					break
+				}
+			}
+		}
+	}
+
+	// Sort matches by relevance (exact word matches first)
+	exactMatches := []string{}
+	partialMatches := []string{}
+
+	for _, match := range matches {
+		keywords := topics[match]
+		exactMatch := false
+		for _, searchWord := range searchWords {
+			for _, keyword := range keywords {
+				if searchWord == keyword {
+					exactMatch = true
+					break
+				}
+			}
+			if exactMatch {
+				break
+			}
+		}
+
+		if exactMatch {
+			exactMatches = append(exactMatches, match)
+		} else {
+			partialMatches = append(partialMatches, match)
+		}
+	}
+
+	// Return exact matches first, then partial matches, limited to 5 suggestions
+	result := append(exactMatches, partialMatches...)
+	if len(result) > 5 {
+		result = result[:5]
+	}
+
+	return result
 }
 
 // /* Initialiserer 'wiki' kommandoen. */
