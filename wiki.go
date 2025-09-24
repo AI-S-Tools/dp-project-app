@@ -1,3 +1,4 @@
+/* ::GEMINI:09: Koden kan optimeres betydeligt ved at flytte de store tekstblokke i `show...` funktionerne til eksterne filer for at reducere binærstørrelsen og forbedre vedligeholdelsen.:: */
 package main
 
 import (
@@ -7,8 +8,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// /* Definerer 'wiki' kommandoen for at søge i vidensbasen. */
 var wikiCmd = &cobra.Command{
-	Use:   "wiki [search-terms]",
+	Use:   "wiki [search-terms",
 	Short: "Search DPPM knowledge base and examples",
 	Long: `DPPM Wiki - AI-Friendly Knowledge Base
 
@@ -50,6 +52,7 @@ Examples:
 	},
 }
 
+// /* Viser hovedindekset for wikien. */
 func showWikiIndex() {
 	fmt.Println(`DPPM Wiki - AI-Friendly Knowledge Base
 =====================================
@@ -76,6 +79,7 @@ This wiki is optimized for AI systems. Each topic includes:
 Type 'dppm wiki list' to see all available topics.`)
 }
 
+// /* Viser en liste over alle tilgængelige wiki-emner. */
 func showWikiTopics() {
 	fmt.Println(`Available Wiki Topics:
 =====================
@@ -127,6 +131,7 @@ func showWikiTopics() {
   • "ai workflow" - AI-optimized project workflow`)
 }
 
+// /* Søger i wikien efter et bestemt emne. */
 func searchWiki(searchTerm string) {
 	// Convert to lowercase for case-insensitive search
 	searchLower := strings.ToLower(searchTerm)
@@ -180,6 +185,7 @@ func searchWiki(searchTerm string) {
 	}
 }
 
+// /* Viser en introduktion til DPPM. */
 func showIntroductionGuide() {
 	fmt.Println(`What is DPPM?
 ============
@@ -226,6 +232,7 @@ This enables automatic sync across all your devices.
   dppm --help                    # Command reference`)
 }
 
+// /* Viser en 'getting started' guide. */
 func showGettingStartedGuide() {
 	fmt.Println(`Getting Started Guide
 ====================
@@ -288,6 +295,7 @@ Advanced:
   dppm wiki "create project"      # Start building`)
 }
 
+// /* Viser en guide til oprettelse af projekter. */
 func showProjectCreationGuide() {
 	fmt.Println(`Project Creation Guide
 =====================
@@ -328,6 +336,7 @@ func showProjectCreationGuide() {
   • dppm wiki "create phase"       # Next step guide`)
 }
 
+// /* Viser en guide til oprettelse af faser. */
 func showPhaseCreationGuide() {
 	fmt.Println(`Phase Creation Guide
 ===================
@@ -376,6 +385,7 @@ func showPhaseCreationGuide() {
   • dppm wiki "create task"               # Add tasks to phase`)
 }
 
+// /* Viser en guide til oprettelse af opgaver. */
 func showTaskCreationGuide() {
 	fmt.Println(`Task Creation Guide
 ==================
@@ -436,6 +446,7 @@ func showTaskCreationGuide() {
   • dppm wiki "dependencies"              # Dependency management`)
 }
 
+// /* Viser en guide til afhængighedsstyring. */
 func showDependencyGuide() {
 	fmt.Println(`Dependency Management Guide
 ==========================
@@ -491,6 +502,7 @@ A task with dependencies cannot start until all dependency tasks are "done".
   • dppm wiki "status commands"  # All status options`)
 }
 
+// /* Viser en guide til status- og rapporteringskommandoer. */
 func showStatusGuide() {
 	fmt.Println(`Status & Reporting Guide
 =======================
@@ -557,6 +569,7 @@ func showStatusGuide() {
   • dppm wiki "dependencies"       # Dependency management`)
 }
 
+// /* Viser en guide til løsning af blokerede opgaver. */
 func showBlockedTasksGuide() {
 	fmt.Println(`Blocked Tasks Resolution Guide
 =============================
@@ -616,6 +629,7 @@ The task cannot start until ALL dependencies are marked "done".
   • dppm wiki "status commands"    # Status monitoring`)
 }
 
+// /* Viser en guide til projektets mappestruktur. */
 func showStructureGuide() {
 	fmt.Println(`Project Structure Guide
 ======================
@@ -693,6 +707,7 @@ task.yaml:
   • dppm list tasks --phase Y     # Browse phase tasks`)
 }
 
+// /* Viser en komplet guide til projektets arbejdsgang. */
 func showWorkflowGuide() {
 	fmt.Println(`Complete Project Workflow Guide
 ==============================
@@ -781,6 +796,7 @@ And so on...
    • dppm wiki "status commands"   # Monitoring tools`)
 }
 
+// /* Viser et komplet eksempel på en arbejdsgang i DPPM. */
 func showCompleteWorkflow() {
 	fmt.Println(`Complete DPPM Workflow Example
 =============================
@@ -876,6 +892,7 @@ This example shows how DPPM manages complex projects with proper dependencies,
 phase organization, and clear workflow progression!`)
 }
 
+// /* Viser en guide til forskellige projekttyper. */
 func showProjectTypesGuide() {
 	fmt.Println(`Project Types Guide
 ==================
@@ -946,6 +963,7 @@ Use Task-Based When:
   • dppm wiki "project workflow"  # Complete examples`)
 }
 
+// /* Viser en guide til aktive opgaver. */
 func showActiveTasksGuide() {
 	fmt.Println(`Active Tasks Guide
 =================
@@ -1007,6 +1025,7 @@ Mark task as completed:
   • dppm wiki "task workflow"     # Task lifecycle`)
 }
 
+// /* Viser en guide til aktive faser. */
 func showActivePhasesGuide() {
 	fmt.Println(`Active Phases Guide
 ==================
@@ -1072,6 +1091,7 @@ Complete a phase:
   • dppm wiki "phase workflow"    # Phase management`)
 }
 
+// /* Viser en guide til afhængighedsorden. */
 func showDependencyOrderGuide() {
 	fmt.Println(`Dependency Order Guide
 =====================
@@ -1152,6 +1172,7 @@ Remove dependency:
   • dppm wiki "blocked tasks"     # Resolving blocks`)
 }
 
+// /* Viser en guide til opbygning af projekter. */
 func showProjectBuildingGuide() {
 	fmt.Println(`Project Building Guide
 =====================
@@ -1278,6 +1299,7 @@ Track progress with:
   • dppm wiki "ai workflow"       # AI-optimized workflow`)
 }
 
+// /* Viser en guide til at liste aktivt arbejde. */
 func showListActiveGuide() {
 	fmt.Println(`List Active Work Guide
 =====================
@@ -1357,6 +1379,7 @@ Create a project dashboard:
   • dppm wiki "status commands"   # All status options`)
 }
 
+// /* Viser en guide til at finde opgaver. */
 func showFindTaskGuide() {
 	fmt.Println(`Find Task Guide
 ==============
@@ -1439,6 +1462,7 @@ View task file directly:
   • dppm wiki "task workflow"     # Task management`)
 }
 
+// /* Viser en guide til AI-optimeret arbejdsgang. */
 func showAIWorkflowGuide() {
 	fmt.Println(`AI-Optimized Workflow Guide
 ===========================
@@ -1573,6 +1597,7 @@ This workflow is fully self-documented and AI-discoverable!
   • dppm --wiki "any question"   # Direct search`)
 }
 
+// /* Viser en guide til AI-samarbejdssystemet. */
 func showAICollaborationGuide() {
 	fmt.Println(`AI Collaboration System
 =======================
@@ -1681,6 +1706,7 @@ Quick Setup:
   • dppm wiki "ai workflow"                  # AI-optimized DPPM usage`)
 }
 
+// /* Initialiserer 'wiki' kommandoen. */
 func init() {
 	rootCmd.AddCommand(wikiCmd)
 }
