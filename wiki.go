@@ -1724,6 +1724,681 @@ Quick Setup:
   • dppm wiki "ai workflow"                  # AI-optimized DPPM usage`)
 }
 
+
+// /* Viser task components guiden. */
+func showTaskComponentsGuide() {
+	fmt.Println(`Task Components Guide
+====================
+
+🧩 BREAKING TASKS INTO MANAGEABLE COMPONENTS
+
+Components are sub-tasks that represent specific deliverables within a larger task.
+They help track detailed progress and enable parallel work on complex features.
+
+Component Structure:
+  • Each component has a unique ID within the task
+  • Components include title, description, and status
+  • Components can have their own time estimates
+  • Components support assignee tracking
+
+Creating Components:
+  # Components are defined in the task YAML structure
+  components:
+    - id: frontend-ui
+      title: "User Interface Components"
+      description: "Create login form, dashboard, and navigation"
+      status: todo
+      assignee: frontend-dev
+      estimated_hours: 8
+
+    - id: backend-api
+      title: "API Endpoints"
+      description: "Implement authentication endpoints"
+      status: in_progress
+      assignee: backend-dev
+      estimated_hours: 6
+
+Best Practices:
+  ✅ Break complex tasks into 2-8 components
+  ✅ Each component should be completable in 1-2 days
+  ✅ Use consistent naming across similar tasks
+  ✅ Include time estimates for resource planning
+  ✅ Assign components to specific team members
+
+Common Component Types:
+  • UI/Frontend work
+  • Backend/API development
+  • Database schema changes
+  • Testing and validation
+  • Documentation
+  • Configuration and deployment
+
+Examples:
+  Authentication System Components:
+    → Login form implementation
+    → Password reset functionality
+    → JWT token management
+    → Session handling
+    → Security testing
+
+  File Management Components:
+    → Upload interface
+    → File validation
+    → Storage integration
+    → Download functionality
+    → Access permissions`)
+}
+
+// /* Viser time tracking guiden. */
+func showTimeTrackingGuide() {
+	fmt.Println(`Time Tracking Guide
+==================
+
+⏱️  TRACKING TIME AND ESTIMATES IN DPPM
+
+DPPM includes built-in time tracking capabilities for tasks and components.
+Track estimates, actual time spent, and generate accurate project timelines.
+
+Time Tracking Structure:
+  time_tracking:
+    estimated_hours: 16
+    actual_hours: 18.5
+    start_date: "2023-10-01"
+    completion_date: "2023-10-03"
+    time_logs:
+      - date: "2023-10-01"
+        hours: 6.5
+        description: "Initial setup and research"
+        contributor: "dev-team"
+      - date: "2023-10-02"
+        hours: 8.0
+        description: "Core implementation"
+        contributor: "dev-team"
+
+Time Logging Commands:
+  # Log time for a specific task
+  dppm task update auth-system --log-time 4.5 --description "Frontend development"
+
+  # View time summary for project
+  dppm status project web-app --include-time
+
+  # Generate time report for phase
+  dppm phase show backend --time-report
+
+Best Practices:
+  ✅ Estimate time during task creation
+  ✅ Log time daily for accuracy
+  ✅ Include meaningful descriptions
+  ✅ Track time at component level for detail
+  ✅ Review estimates vs actual regularly
+
+Time Categories:
+  • Development (coding, implementation)
+  • Research (investigation, learning)
+  • Testing (validation, bug fixes)
+  • Documentation (writing, updates)
+  • Meetings (planning, reviews)
+  • Debugging (issue investigation)
+
+Reporting Features:
+  • Project-level time summaries
+  • Phase burn-down charts
+  • Individual contributor reports
+  • Estimation accuracy analysis
+  • Overtime and capacity planning
+
+Example Workflow:
+  1. Estimate task during creation: --estimated-hours 12
+  2. Log daily progress: dppm task update task-id --log-time 3.5
+  3. Review weekly: dppm status project --time-summary
+  4. Adjust estimates: dppm task update task-id --estimated-hours 15`)
+}
+
+// /* Viser issue tracking guiden. */
+func showIssueTrackingGuide() {
+	fmt.Println(`Issue Tracking Guide
+===================
+
+🐛 BUG AND ISSUE MANAGEMENT IN DPPM
+
+Track bugs, improvements, and issues directly within your DPPM tasks.
+Integrated issue tracking keeps everything in one place.
+
+Issue Structure:
+  issues:
+    - id: bug-001
+      type: bug
+      title: "Login form validation error"
+      description: "Email validation fails for certain domains"
+      status: open
+      priority: high
+      reporter: qa-team
+      assignee: frontend-dev
+      created: "2023-10-01"
+      labels: ["frontend", "validation", "critical"]
+
+Issue Types:
+  • bug - Defects and problems
+  • enhancement - Feature improvements
+  • documentation - Doc issues
+  • performance - Speed/efficiency problems
+  • security - Security vulnerabilities
+  • technical-debt - Code quality issues
+
+Issue Lifecycle:
+  open → in_progress → testing → resolved → closed
+
+Creating Issues:
+  # Add issue to existing task
+  dppm task update auth-system --add-issue "Login timeout" --issue-type bug --priority high
+
+  # Create task specifically for issue
+  dppm task create bug-fix-001 --title "Fix login validation" --description "Address email domain validation issue"
+
+Issue Management:
+  # List all open issues
+  dppm status issues --status open
+
+  # Show issues by priority
+  dppm status issues --priority high
+
+  # Update issue status
+  dppm task update auth-system --issue-id bug-001 --issue-status resolved
+
+Best Practices:
+  ✅ Create issues for all identified problems
+  ✅ Use consistent labeling system
+  ✅ Assign priority levels (low, medium, high, critical)
+  ✅ Include reproduction steps for bugs
+  ✅ Link issues to related tasks
+  ✅ Close issues when verified fixed
+
+Reporting:
+  • Open issue counts by project/phase
+  • Issue resolution time tracking
+  • Bug discovery rates
+  • Quality metrics and trends
+
+Integration:
+  • Issues can reference task components
+  • Link to external bug trackers (GitHub, Jira)
+  • Export issues for stakeholder reports
+  • Automated issue creation from test failures`)
+}
+
+// /* Viser project templates guiden. */
+func showProjectTemplatesGuide() {
+	fmt.Println(`Project Templates Guide
+======================
+
+📋 USING AND CREATING DPPM PROJECT TEMPLATES
+
+Templates provide pre-configured project structures for common development patterns.
+Speed up project initialization and ensure consistency across teams.
+
+Available Templates:
+  • web - Web application (frontend + backend)
+  • api - REST API service
+  • mobile - Mobile application
+  • library - Software library/package
+  • data - Data processing pipeline
+  • microservice - Microservice architecture
+
+Using Templates:
+  # Initialize project with template
+  dppm init my-web-app --template web --name "E-commerce Platform"
+
+  # Create project with template
+  dppm project create api-service --template api --name "User Management API"
+
+Template Structure:
+  templates/web/
+  ├── project.yaml          # Project metadata
+  ├── phases/              # Pre-defined phases
+  │   ├── planning/        # Requirements gathering
+  │   ├── backend/         # API development
+  │   ├── frontend/        # UI development
+  │   ├── integration/     # System integration
+  │   └── deployment/      # Go-live activities
+  └── tasks/               # Common task templates
+
+Web Application Template:
+  Phases:
+    1. Planning & Design
+    2. Backend API Development
+    3. Frontend Development
+    4. Integration & Testing
+    5. Deployment & Monitoring
+
+  Common Tasks:
+    • Database schema design
+    • Authentication system
+    • API endpoint implementation
+    • Frontend component development
+    • Integration testing
+    • Deployment pipeline setup
+
+Creating Custom Templates:
+  1. Create template directory structure
+  2. Define project.yaml with metadata
+  3. Add phase and task templates
+  4. Configure default dependencies
+  5. Include documentation templates
+
+Template Configuration:
+  # templates/custom-web/project.yaml
+  name: "{{ .ProjectName }}"
+  template: "custom-web"
+  description: "{{ .Description }}"
+  phases:
+    - id: setup
+      name: "Project Setup"
+      tasks:
+        - environment-setup
+        - dependency-management
+        - ci-cd-pipeline
+
+Best Practices:
+  ✅ Use templates for repeated project types
+  ✅ Customize templates for your organization
+  ✅ Include comprehensive task descriptions
+  ✅ Define realistic time estimates
+  ✅ Document template usage guidelines
+  ✅ Version control template definitions`)
+}
+
+// /* Viser collaboration guiden. */
+func showCollaborationGuide() {
+	fmt.Println(`Team Collaboration Guide
+=======================
+
+👥 WORKING WITH TEAMS IN DPPM
+
+DPPM supports multi-person teams with role-based access, assignment tracking,
+and collaborative workflows for effective project management.
+
+Team Structure:
+  team:
+    - name: "Alice Developer"
+      role: "lead-developer"
+      email: "alice@company.com"
+      skills: ["backend", "database", "devops"]
+    - name: "Bob Frontend"
+      role: "frontend-developer"
+      email: "bob@company.com"
+      skills: ["react", "javascript", "ui-design"]
+
+Task Assignment:
+  # Assign tasks to team members
+  dppm task create user-profile --assignee "alice@company.com"
+  dppm task update existing-task --assignee "bob@company.com"
+
+  # List tasks by assignee
+  dppm list tasks --assignee "alice@company.com"
+  dppm status active --assignee "bob@company.com"
+
+Collaborative Workflows:
+  1. Project Lead creates project and phases
+  2. Tasks assigned to appropriate team members
+  3. Dependencies defined to coordinate work
+  4. Regular status reviews using dppm status commands
+  5. Blocked tasks escalated and resolved quickly
+
+Communication Patterns:
+  # Daily standups
+  dppm status active                    # What can we work on today?
+  dppm status blocked                   # What's blocking progress?
+  dppm list active --assignee me       # My current workload
+
+  # Weekly reviews
+  dppm status project --include-team    # Project health check
+  dppm phase show current --team-view   # Phase completion status
+
+Role-Based Access:
+  • Project Owner: Full project control
+  • Lead Developer: Task creation and assignment
+  • Developer: Task updates and time logging
+  • Reviewer: Status viewing and reporting
+  • Stakeholder: Read-only project visibility
+
+Best Practices:
+  ✅ Assign tasks to specific individuals
+  ✅ Use meaningful task descriptions for context
+  ✅ Update status regularly (daily standups)
+  ✅ Communicate dependencies clearly
+  ✅ Review blocked tasks in team meetings
+  ✅ Celebrate completed milestones
+
+Integration:
+  • Sync with external calendar systems
+  • Export to team communication tools (Slack, Teams)
+  • Generate progress reports for stakeholders
+  • Connect to code repositories for commit tracking
+
+Conflict Resolution:
+  • Clear ownership of tasks prevents overlap
+  • Dependency management coordinates work order
+  • Status visibility identifies conflicts early
+  • Regular team sync prevents misalignment`)
+}
+
+// /* Viser automation guiden. */
+func showAutomationGuide() {
+	fmt.Println(`Automation Guide
+================
+
+🤖 SCRIPTING AND CI/CD INTEGRATION WITH DPPM
+
+Automate project workflows, integrate with CI/CD pipelines, and create
+custom scripts for repetitive DPPM operations.
+
+Command Line Scripting:
+  #!/bin/bash
+  # Daily status report script
+  echo "=== Daily Project Status ==="
+  dppm list active
+  echo -e "\n=== Blocked Tasks ==="
+  dppm status blocked
+  echo -e "\n=== Team Workload ==="
+  dppm status project --team-summary
+
+CI/CD Integration:
+  # In your CI pipeline (GitHub Actions, Jenkins, etc.)
+  steps:
+    - name: Update Task Status
+      run: |
+        dppm task update build-pipeline --status in_progress
+        # Run build/test commands
+        if [ $? -eq 0 ]; then
+          dppm task update build-pipeline --status done
+        else
+          dppm task update build-pipeline --status blocked
+        fi
+
+Automated Task Creation:
+  # Create tasks from issue tracker
+  curl -s "https://api.github.com/repos/owner/repo/issues" | \
+  jq -r '.[] | "dppm task create issue-\(.number) --title \"\(.title)\" --description \"\(.body)\""' | \
+  bash
+
+Project Templates Automation:
+  # Bulk project creation
+  for project in web-app mobile-app admin-panel; do
+    dppm init $project --template web --skip-github
+    dppm bind $project
+    dppm task create setup --title "Initial Setup" --phase planning
+  done
+
+Monitoring and Alerting:
+  #!/bin/bash
+  # Alert on blocked tasks
+  BLOCKED_COUNT=$(dppm status blocked | grep -c "ID:")
+  if [ $BLOCKED_COUNT -gt 5 ]; then
+    echo "WARNING: $BLOCKED_COUNT tasks are blocked!"
+    # Send alert to team (Slack, email, etc.)
+  fi
+
+API Integration:
+  # Export DPPM data to external systems
+  dppm status project --format json | curl -X POST \
+    -H "Content-Type: application/json" \
+    -d @- https://your-dashboard.com/api/projects
+
+Batch Operations:
+  # Bulk task updates
+  dppm list tasks --status in_progress --format json | \
+  jq -r '.[].id' | \
+  xargs -I {} dppm task update {} --add-label "sprint-2"
+
+Custom Commands:
+  # Create alias for common operations
+  alias daily-standup='dppm list active && dppm status blocked'
+  alias my-tasks='dppm list active --assignee $(git config user.email)'
+
+Reporting Automation:
+  # Weekly progress report
+  #!/bin/bash
+  DATE=$(date +%Y-%m-%d)
+  echo "# Weekly Report - $DATE" > report.md
+  echo "## Active Tasks" >> report.md
+  dppm list active >> report.md
+  echo "## Completed This Week" >> report.md
+  dppm list tasks --status done --updated-since "7 days ago" >> report.md
+
+Best Practices:
+  ✅ Use dppm commands in build scripts
+  ✅ Automate status updates based on CI results
+  ✅ Create monitoring for blocked tasks
+  ✅ Generate regular progress reports
+  ✅ Integrate with team communication tools
+  ✅ Version control your automation scripts`)
+}
+
+// /* Viser troubleshooting guiden. */
+func showTroubleshootingGuide() {
+	fmt.Println(`Troubleshooting Guide
+====================
+
+🔧 COMMON ISSUES AND SOLUTIONS
+
+Problem: "No DPPM project found in current directory"
+Solution:
+  • Run: dppm bind <project-id> to bind current directory
+  • Or: cd to a directory with existing DPPM binding
+  • Or: Use --project flag: dppm task create --project <project-id>
+
+Problem: "Task creation fails with dependency error"
+Solution:
+  • Verify dependency task exists: dppm task show <dependency-id>
+  • Check project scope: dependencies must be in same project
+  • Use correct task ID format (lowercase, no spaces)
+
+Problem: "Wiki topics return 'No specific guide found'"
+Solution:
+  • Use: dppm wiki list to see all available topics
+  • Try alternative search terms
+  • Use quotes for multi-word searches: "project types"
+
+Problem: "Collab clean not removing DSL markers"
+Solution:
+  • Verify DONE marker format: ::DONE:01:: content ::
+  • Ensure task ID matches: ::LARS:01:: and ::DONE:01::
+  • Check file has .md extension
+
+Problem: "Commands run slowly or timeout"
+Solution:
+  • Check Dropbox sync status
+  • Verify ~/Dropbox/project-management exists
+  • Restart Dropbox client if needed
+  • Use local binding instead of network paths
+
+Problem: "Project binding lost after directory changes"
+Solution:
+  • Re-run: dppm bind <project-id>
+  • Check .dppm/project.yaml file exists
+  • Verify project still exists in Dropbox
+
+Problem: "Task dependencies create circular references"
+Solution:
+  • Use: dppm status dependencies to visualize
+  • Remove problematic dependency: dppm task update --remove-dependency
+  • Redesign task breakdown to avoid cycles
+
+Problem: "Phase creation fails with permission error"
+Solution:
+  • Check Dropbox folder permissions
+  • Verify project directory exists
+  • Run dppm with proper user permissions
+  • Check disk space availability
+
+Problem: "Time tracking data not saving"
+Solution:
+  • Use correct time format: --log-time 4.5
+  • Verify task exists before logging time
+  • Check YAML file is writable
+  • Ensure proper date format in logs
+
+Problem: "Wiki search returns wrong results"
+Solution:
+  • Use specific terms: "task creation" not "tasks"
+  • Try alternative phrasings
+  • Check spelling of search terms
+  • Use dppm wiki list to browse available topics
+
+Diagnostic Commands:
+  dppm --version                # Check DPPM version
+  dppm status project --debug   # Debug project status
+  dppm wiki list               # Verify wiki availability
+  ls ~/.dppm/                  # Check local configuration
+
+Getting Help:
+  • dppm --help for command reference
+  • dppm <command> --help for specific help
+  • dppm wiki list for available guides
+  • Check project documentation
+  • Review error messages carefully
+
+Performance Tips:
+  • Use local binding to avoid network calls
+  • Minimize large YAML files
+  • Regular cleanup of completed tasks
+  • Use filters to limit output size`)
+}
+
+// /* Viser real world guiden. */
+func showRealWorldGuide() {
+	fmt.Println(`Real World Usage Examples
+========================
+
+🌍 PRACTICAL SCENARIOS AND IMPLEMENTATION PATTERNS
+
+Scenario 1: E-commerce Web Application
+======================================
+
+Project Structure:
+  dppm project create ecommerce --name "Online Store Platform"
+
+  Phases:
+    1. Requirements & Planning (2 weeks)
+    2. Backend API Development (4 weeks)
+    3. Frontend Development (4 weeks)
+    4. Payment Integration (2 weeks)
+    5. Testing & QA (3 weeks)
+    6. Deployment & Launch (1 week)
+
+Sample Tasks with Dependencies:
+  # Planning phase
+  dppm task create market-research --phase planning --estimated-hours 40
+  dppm task create tech-stack --phase planning --dependency-ids market-research
+
+  # Backend development
+  dppm task create database-schema --phase backend --dependency-ids tech-stack
+  dppm task create user-auth --phase backend --dependency-ids database-schema
+  dppm task create product-catalog --phase backend --dependency-ids database-schema
+  dppm task create order-system --phase backend --dependency-ids user-auth,product-catalog
+
+Team Assignment:
+  Alice (Lead): database-schema, user-auth
+  Bob (Backend): product-catalog, order-system
+  Carol (Frontend): user-interface, shopping-cart
+  Dave (DevOps): deployment, monitoring
+
+Scenario 2: API Microservice Development
+========================================
+
+Project Structure:
+  dppm project create user-service --template api
+
+  Components per Task:
+  dppm task create authentication --components api-endpoints,database-layer,security-tests
+  dppm task create user-profile --components crud-operations,validation,caching
+  dppm task create admin-panel --components user-management,permissions,audit-log
+
+CI/CD Integration:
+  # In deployment pipeline
+  dppm task update user-service --status in_progress
+  # Run tests
+  if tests_pass; then
+    dppm task update user-service --status done --log-time 2.5
+  else
+    dppm task update user-service --status blocked --add-issue "Test failures"
+  fi
+
+Scenario 3: Mobile App with Backend
+===================================
+
+Cross-Platform Coordination:
+  # Backend team
+  dppm project create mobile-backend --template api
+  dppm task create auth-api --assignee backend-team
+  dppm task create user-data-api --dependency-ids auth-api
+
+  # Mobile team
+  dppm project create mobile-app --template mobile
+  dppm task create login-screen --dependency-ids auth-api --assignee mobile-team
+  dppm task create profile-screen --dependency-ids user-data-api
+
+Scenario 4: Data Processing Pipeline
+====================================
+
+ETL Workflow:
+  dppm project create data-pipeline --template data
+
+  Sequential Tasks:
+  dppm task create data-extraction --estimated-hours 16
+  dppm task create data-transformation --dependency-ids data-extraction
+  dppm task create data-loading --dependency-ids data-transformation
+  dppm task create monitoring-setup --dependency-ids data-loading
+
+Scenario 5: Legacy System Migration
+===================================
+
+Phased Migration:
+  Phase 1: Assessment (dppm phase create assessment)
+    → Inventory existing systems
+    → Identify migration challenges
+    → Plan migration strategy
+
+  Phase 2: Infrastructure (dppm phase create infrastructure)
+    → Set up new environment
+    → Configure databases
+    → Establish security protocols
+
+  Phase 3: Data Migration (dppm phase create data-migration)
+    → Export legacy data
+    → Transform data format
+    → Import to new system
+    → Validate data integrity
+
+Real-World Tips:
+================
+
+Team Coordination:
+  • Daily: dppm list active --assignee me
+  • Weekly: dppm status project --include-team
+  • Monthly: dppm phase show --completion-report
+
+Issue Management:
+  • Link DPPM tasks to GitHub issues
+  • Use consistent labeling across projects
+  • Track issue resolution time
+
+Time Tracking:
+  • Log time daily for accuracy
+  • Use consistent time categories
+  • Review estimates vs actual monthly
+
+Automation Integration:
+  • Update task status from CI/CD results
+  • Generate reports for stakeholders
+  • Monitor blocked tasks automatically
+
+Quality Assurance:
+  • Include testing in every phase
+  • Define clear acceptance criteria
+  • Track defect discovery rates`)
+}
+
 // /* Initialiserer 'wiki' kommandoen. */
 func init() {
 	rootCmd.AddCommand(wikiCmd)
