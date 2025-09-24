@@ -116,6 +116,7 @@ func showWikiTopics() {
   • "issue tracking" - Bug and issue management
   • "project templates" - Using and creating templates
   • "collaboration" - Working with teams
+  • "ai collaboration" - AI-to-AI task coordination with DSL markers
   • "automation" - Scripting and CI/CD integration
   • "reporting" - Generate progress reports
   • "troubleshooting" - Common issues and solutions
@@ -167,6 +168,8 @@ func searchWiki(searchTerm string) {
 		showFindTaskGuide()
 	case strings.Contains(searchLower, "ai workflow") || strings.Contains(searchLower, "ai project"):
 		showAIWorkflowGuide()
+	case strings.Contains(searchLower, "ai collaboration") || strings.Contains(searchLower, "dsl markers"):
+		showAICollaborationGuide()
 	default:
 		fmt.Printf("No specific guide found for '%s'\n\n", searchTerm)
 		fmt.Println("Try one of these common searches:")
@@ -1568,6 +1571,114 @@ This workflow is fully self-documented and AI-discoverable!
   • dppm wiki list               # All topics
   • dppm wiki complete           # Full example
   • dppm --wiki "any question"   # Direct search`)
+}
+
+func showAICollaborationGuide() {
+	fmt.Println(`AI Collaboration System
+=======================
+
+🤖 AI-TO-AI TASK COORDINATION:
+
+DPPM includes a comprehensive AI collaboration system using DSL markers
+for structured handoffs between different AI models. This enables teams
+of AI agents to work together on complex projects.
+
+🏷️ DSL MARKER SYSTEM:
+
+Task Assignment:
+  ::LARS:1:: Implement user authentication system ::
+  ::GEMINI:2:: Design the user interface for login ::
+
+Completion Tracking:
+  ::DONE:1,2:: Authentication and UI completed ::
+
+🔄 COLLABORATION WORKFLOW:
+
+1. Create collaboration workspace in project docs
+2. Assign tasks to appropriate AI models using DSL markers
+3. AIs work on assigned tasks and update progress
+4. Mark completed tasks with DONE markers
+5. Clean up completed tasks to maintain workspace
+
+📋 AVAILABLE COMMANDS:
+
+Find Active Tasks:
+  dppm collab find                # Find all DSL tasks
+  dppm collab find docs/          # Search specific directory
+
+Clean Completed Work:
+  dppm collab clean               # Remove completed tasks
+  dppm collab clean docs/         # Clean specific directory
+
+Learn Collaboration:
+  dppm collab wiki                # Collaboration wiki index
+  dppm collab wiki "task handoff" # Learn handoff patterns
+
+🎯 AI SPECIALIZATION:
+
+LARS (Claude) - Best for:
+  • Code implementation and debugging
+  • Technical analysis and architecture
+  • Documentation and structured writing
+  • Security and best practices review
+
+GEMINI (Google) - Best for:
+  • Creative problem-solving and brainstorming
+  • User experience and design thinking
+  • Content creation and copywriting
+  • Alternative approaches and innovation
+
+🚀 INTEGRATION WITH DPPM:
+
+The collaboration system works seamlessly with DPPM projects:
+  • Store collaboration tasks in project documentation
+  • Link AI tasks to DPPM phases and milestones
+  • Use project structure to organize AI workflows
+  • Archive completed collaborative work
+
+📊 EXAMPLE COLLABORATIVE PROJECT:
+
+Web Application Development:
+  ::LARS:10:: Design system architecture and data models ::
+  ::GEMINI:11:: Create user journey maps and wireframes ::
+  ::LARS:12:: Implement backend API based on architecture ::
+  ::GEMINI:13:: Design responsive frontend components ::
+  ::LARS:14:: Write comprehensive tests and documentation ::
+
+Completion:
+  ::DONE:10,11,12,13,14:: Web application completed ::
+
+💡 BEST PRACTICES:
+
+Task Design:
+  ✅ Clear, actionable task descriptions
+  ✅ Specific deliverables and success criteria
+  ✅ Appropriate AI assignment based on strengths
+  ✅ Logical dependency ordering
+
+Workflow Management:
+  ✅ Regular cleanup of completed tasks
+  ✅ Archive important decisions and outcomes
+  ✅ Use sequential numbering for task IDs
+  ✅ Document handoff context clearly
+
+🔍 Getting Started:
+
+Quick Setup:
+  # Create collaboration workspace
+  mkdir -p docs/collaboration
+  echo "# Active AI Tasks" > docs/collaboration/active-tasks.md
+  echo "::LARS:1:: Plan the project structure ::" >> docs/collaboration/active-tasks.md
+
+  # Find and manage tasks
+  dppm collab find docs/collaboration/
+  dppm collab clean docs/collaboration/
+
+🔍 Related Commands:
+  • dppm collab wiki "collaboration basics"  # Detailed introduction
+  • dppm collab wiki "workflow patterns"     # Common patterns
+  • dppm collab wiki "integration"           # DPPM integration
+  • dppm wiki "ai workflow"                  # AI-optimized DPPM usage`)
 }
 
 func init() {

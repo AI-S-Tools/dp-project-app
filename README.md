@@ -13,7 +13,21 @@ A comprehensive CLI tool for managing projects, sprints, and tasks using Dropbox
 
 ## Installation
 
-### Option 1: One-Line Install (Recommended)
+### Option 1: Homebrew (macOS/Linux)
+
+```bash
+# Add the tap (once)
+brew tap AI-S-Tools/dp-project-app https://github.com/AI-S-Tools/dp-project-app
+
+# Install DPPM
+brew install dppm
+
+# Verify installation
+dppm --version
+dppm wiki "getting started"
+```
+
+### Option 2: One-Line Install (All Platforms)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AI-S-Tools/dp-project-app/master/install.sh | bash
@@ -25,14 +39,14 @@ This script automatically:
 - ✅ Installs to the correct location
 - ✅ Makes it executable
 
-### Option 2: Manual Download
+### Option 3: Manual Download
 
 Download the latest binary for your platform from [Releases](https://github.com/AI-S-Tools/dp-project-app/releases):
 
 #### Linux / macOS
 ```bash
 # Download binary (replace with your platform)
-wget https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-amd64
+curl -L -o dppm-linux-amd64 https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-amd64
 
 # Make executable and install
 chmod +x dppm-linux-amd64

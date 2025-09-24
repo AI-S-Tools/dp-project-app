@@ -26,10 +26,12 @@ Features:
   • Built-in knowledge base and examples (dppm wiki)
   • Comprehensive dependency management
   • Template-based project creation
+  • AI collaboration system with DSL markers
 
 Storage Location: ~/Dropbox/project-management/
 
 🚀 Quick Start Guide:
+  dppm init my-project                # Complete project initialization
   dppm wiki                           # Show knowledge base
   dppm --wiki "create project"        # Search for help
   dppm project create my-project      # Create new project
@@ -42,11 +44,14 @@ Storage Location: ~/Dropbox/project-management/
   dppm --help                         # Command reference
 
 Examples:
+  dppm init web-app --doc "./requirements.md" # Complete project setup
   dppm project create web-app --name "Web Application" --owner "dev-team"
   dppm phase create backend --project web-app --name "Backend Development"
   dppm task create auth --project web-app --phase backend --title "Authentication"
   dppm status project web-app
   dppm list projects
+  dppm collab find docs/                # Find AI collaboration tasks
+  dppm collab wiki "task handoff"       # Learn collaboration patterns
 
 🤖 AI Usage:
 DPPM is designed for AI-driven workflows. Use the wiki system for comprehensive
@@ -64,12 +69,14 @@ func init() {
 	home, _ := os.UserHomeDir()
 	projectsPath = filepath.Join(home, "Dropbox", "project-management")
 
+	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(projectCmd)
 	rootCmd.AddCommand(phaseCmd)
 	rootCmd.AddCommand(taskCmd)
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(statusCmd)
 	rootCmd.AddCommand(wikiCmd)
+	rootCmd.AddCommand(collabCmd)
 
 	// Add --wiki flag for direct search
 	rootCmd.Flags().String("wiki", "", "Search DPPM knowledge base (e.g. --wiki \"create task\")")
@@ -131,6 +138,7 @@ func showStartupGuide() {
   • Creating tasks? → dppm --wiki "create task"
   • Managing dependencies? → dppm --wiki "dependencies"
   • Checking progress? → dppm status project PROJECT_NAME
+  • AI collaboration? → dppm collab wiki
 
 🤖 AI TIP:
 DPPM is designed for AI workflows. The wiki system contains comprehensive

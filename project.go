@@ -101,6 +101,14 @@ AI Usage Tips:
 			name = projectID
 		}
 
+		// Warn about missing description
+		if description == "" {
+			fmt.Println("⚠️  Warning: Project created without description")
+			fmt.Println("💡 Consider adding --description for better project context and AI collaboration")
+			fmt.Println("   Example: --description \"Detailed explanation of project goals and scope\"")
+			fmt.Println()
+		}
+
 		project := Project{
 			ID:          projectID,
 			Name:        name,

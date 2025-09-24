@@ -102,6 +102,14 @@ Examples:
 			name = phaseID
 		}
 
+		// Warn about missing goal
+		if goal == "" {
+			fmt.Println("⚠️  Warning: Phase created without goal")
+			fmt.Println("💡 Consider adding --goal for better phase context and planning")
+			fmt.Println("   Example: --goal \"Deliver authentication system with complete user management\"")
+			fmt.Println()
+		}
+
 		phase := Phase{
 			ID:        phaseID,
 			Name:      name,
