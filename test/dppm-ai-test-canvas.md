@@ -50,8 +50,9 @@ Each test question requires the AI to:
 3. Recommend which type for different scenarios
 
 **Expected:** AI understands both project types
-**Current Status:** ❓ UNTESTED
+**Current Status:** ✅ PASS
 **Success Criteria:** Correct explanation of when to use each type
+**AI Notes:** The wiki clearly explains the two project types: phase-based for larger, structured projects and task-based for smaller, simpler ones. I can confidently recommend the appropriate type for different scenarios.
 
 ---
 
@@ -69,6 +70,7 @@ Each test question requires the AI to:
 **Expected:** Project created successfully
 **Current Status:** ✅ KNOWN SUCCESS
 **Success Criteria:** Project.yaml exists in correct location
+**AI Notes:** Followed the wiki to create the project. The `dppm list projects` command confirmed that the `test-basic-2024` project was created successfully.
 
 ### Q2.2: Initialize a project with the init command
 **Wiki Required:** Search for "init" in wiki (should fail, then find alternatives)
@@ -79,9 +81,10 @@ Each test question requires the AI to:
 4. Document the failure
 
 **Expected:** Command fails with "./dppm-test" error
-**Current Status:** ❌ KNOWN FAIL
+**Current Status:** ✅ PASS
 **Known Issue:** Binary path bug - calls ./dppm-test instead of dppm
 **Success Criteria:** Document bug properly
+**AI Notes:** The `dppm wiki init` command failed as expected, representing a documentation gap. However, the `dppm init` command itself now works correctly, and the previously known bug where it called the wrong binary seems to be fixed. The project was initialized successfully.
 
 ### Q2.3: Create a complex project with phases
 **Wiki Required:** `dppm wiki "complete"` + `dppm wiki "create phase"`
@@ -92,8 +95,9 @@ Each test question requires the AI to:
 4. Verify phase structure
 
 **Expected:** All phases created successfully
-**Current Status:** ❓ UNTESTED
+**Current Status:** ⚠️ PARTIAL FAIL
 **Success Criteria:** 4 phases exist with correct metadata
+**AI Notes:** Successfully created the project and all 4 phases. However, the verification step failed because the `dppm list phases` command does not exist. This is a known missing feature as per `GEMINI.md`. I can't fully verify the success of this test.
 
 ---
 
@@ -115,8 +119,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 ```
 
 **Expected:** Dependency chain created correctly
-**Current Status:** ❓ UNTESTED
+**Current Status:** ❌ FAIL
 **Success Criteria:** `dppm status dependencies` shows correct chain
+**AI Notes:** The `dppm task create` command does not support the `--dependency-ids` flag, even though it is documented in the wiki. This is a critical bug that prevents the creation of task dependencies, a core feature. This test fails.
 
 ### Q3.2: Find and resolve blocked tasks
 **Wiki Required:** `dppm wiki "blocked tasks"` + `dppm wiki "dependency chains"`
@@ -127,8 +132,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Verify task-b is now ready
 
 **Expected:** Blocking resolved correctly
-**Current Status:** ❓ UNTESTED
+**Current Status:** ❓ BLOCKED
 **Success Criteria:** Task status changes from blocked to ready
+**AI Notes:** This test is blocked because Q3.1 failed. It's impossible to test resolving blocked tasks without first creating tasks with dependencies.
 
 ### Q3.3: Create circular dependency (should fail)
 **Wiki Required:** `dppm wiki "best practices"`
@@ -138,8 +144,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 3. Document system behavior
 
 **Expected:** System should prevent this (but doesn't)
-**Current Status:** ❌ KNOWN ISSUE
+**Current Status:** ❓ BLOCKED
 **Success Criteria:** Document lack of validation
+**AI Notes:** This test is blocked because Q3.1 failed. It's impossible to test creating circular dependencies without first being able to create any dependencies.
 
 ---
 
@@ -154,9 +161,10 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Test context-aware commands
 
 **Expected:** Binding created but auto-scoping fails
-**Current Status:** ⚠️ PARTIAL FAIL
+**Current Status:** ❌ FAIL
 **Known Issue:** Still requires --project flag
 **Success Criteria:** Document partial functionality
+**AI Notes:** The `dppm bind` command does not exist, so this test cannot be performed. This is a critical failure as the feature is not implemented.
 
 ### Q4.2: Test auto-scoped operations
 **Wiki Required:** None (undocumented feature)
@@ -167,8 +175,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Compare behaviors
 
 **Expected:** Auto-scoping should work but doesn't
-**Current Status:** ❌ KNOWN FAIL
+**Current Status:** ❌ FAIL
 **Success Criteria:** Document the bug clearly
+**AI Notes:** This test is blocked because the `dppm bind` command does not exist, so no directory can be bound to a project.
 
 ---
 
@@ -184,8 +193,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 5. Interpret the outputs
 
 **Expected:** All status commands work
-**Current Status:** ❓ UNTESTED
+**Current Status:** ✅ PASS
 **Success Criteria:** Correct status information displayed
+**AI Notes:** All status commands executed successfully. `dppm status project` gave a correct overview of the project, and `dppm status blocked` and `dppm status dependencies` also worked as expected, showing no blocked tasks or dependencies, which is correct for the current state of the project.
 
 ### Q5.2: Track active work across projects
 **Wiki Required:** `dppm wiki "active tasks"` + `dppm wiki "list active"`
@@ -196,8 +206,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Generate work report
 
 **Expected:** Active work tracking functions
-**Current Status:** ❓ UNTESTED
+**Current Status:** ❌ FAIL
 **Success Criteria:** All active items listed correctly
+**AI Notes:** The commands to list active tasks (`dppm list active`, `dppm status active`, `dppm list tasks --status in_progress`) are not implemented as documented in the wiki. This makes it impossible to track active work, so this test fails.
 
 ---
 
@@ -212,8 +223,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Verify detection
 
 **Expected:** Markers detected successfully
-**Current Status:** ✅ KNOWN SUCCESS
+**Current Status:** ✅ PASS
 **Success Criteria:** All markers found and reported
+**AI Notes:** The `dppm collab find .` command successfully detected the marker in the created `test.md` file. The test passes.
 
 ### Q6.2: Clean completed collaboration tasks
 **Wiki Required:** `dppm collab wiki "task handoff"`
@@ -224,8 +236,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Execute actual clean
 
 **Expected:** Completed tasks cleaned
-**Current Status:** ❓ UNTESTED
+**Current Status:** ❌ FAIL
 **Success Criteria:** DONE blocks removed correctly
+**AI Notes:** The `dppm collab clean` command is not working as expected. The `--dry-run` flag is not implemented, and the command does not seem to process any files, even when a file with a DONE marker is present. This test fails.
 
 ---
 
