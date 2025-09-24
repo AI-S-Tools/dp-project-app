@@ -219,7 +219,7 @@ func cleanCompletedTasks(searchPaths []string) {
 			}
 
 			// Check for DONE markers
-			doneRegex := regexp.MustCompile(`::DONE:\s*([0-9, ]+)\s*::`)
+			doneRegex := regexp.MustCompile(`::DONE:\s*([0-9, ]+)\s*::[^:]*::`)
 			if !doneRegex.MatchString(string(content)) {
 				return nil
 			}
@@ -227,7 +227,8 @@ func cleanCompletedTasks(searchPaths []string) {
 			fmt.Printf("📄 Processing: %s\n", path)
 
 			// Extract DONE IDs
-			doneMatches := doneRegex.FindAllStringSubmatch(string(content), -1)
+			idRegex := regexp.MustCompile(`::DONE:\s*([0-9, ]+)\s*::`)
+			doneMatches := idRegex.FindAllStringSubmatch(string(content), -1)
 			var allIDs []string
 
 			for _, match := range doneMatches {
@@ -259,7 +260,7 @@ func cleanCompletedTasks(searchPaths []string) {
 				fmt.Printf("   🗑️  Removing blocks for ID: %s\n", id)
 
 				// Remove LARS and GEMINI blocks for this ID
-			taskRegex := regexp.MustCompile(fmt.Sprintf(`::(LARS|GEMINI):\s*%s\s*::.*?::\s*`, regexp.QuoteMeta(id)))
+			taskRegex := regexp.MustCompile(fmt.Sprintf(`::(LARS|GEMINI):\s*%s\s*::[^:]*::`, regexp.QuoteMeta(id)))
 				updatedContent = taskRegex.ReplaceAllString(updatedContent, "")
 			}
 
