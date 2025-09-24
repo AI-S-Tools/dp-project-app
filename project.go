@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -100,6 +102,19 @@ AI Usage Tips:
 		description, _ := cmd.Flags().GetString("description")
 		owner, _ := cmd.Flags().GetString("owner")
 
+		// Validate project ID
+		if err := validateProjectID(projectID); err != nil {
+			fmt.Fprintf(os.Stderr, "❌ Error: %v\n", err)
+			return
+		}
+
+		// Check for duplicate project
+		if projectExists(projectID) {
+			fmt.Fprintf(os.Stderr, "❌ Error: Project '%s' already exists\n", projectID)
+			fmt.Fprintf(os.Stderr, "Use a different project ID or run 'dppm status project %s' to see existing project\n", projectID)
+			return
+		}
+
 		if name == "" {
 			name = projectID
 		}
@@ -150,6 +165,42 @@ AI Usage Tips:
 
 		fmt.Printf("Project '%s' created successfully\n", projectID)
 	},
+}
+
+// /* Validerer projekt ID. */
+func validateProjectID(projectID string) error {
+	// Check for empty ID
+	if strings.TrimSpace(projectID) == "" {
+		return fmt.Errorf("Project ID cannot be empty")
+	}
+
+	// Check for valid characters (lowercase, alphanumeric, hyphens, underscores)
+	validID := regexp.MustCompile(`^[a-z0-9][a-z0-9_-]*$`)
+	if !validID.MatchString(projectID) {
+		return fmt.Errorf("Invalid project ID '%s'. Project IDs must:\n  • Start with a lowercase letter or number\n  • Contain only lowercase letters, numbers, hyphens, and underscores\n  • Example: 'web-app', 'api_server', 'mobile2'", projectID)
+	}
+
+	// Check length limits
+	if len(projectID) > 50 {
+		return fmt.Errorf("Project ID '%s' is too long (max 50 characters)", projectID)
+	}
+
+	// Check for reserved names
+	reserved := []string{"help", "version", "list", "status", "wiki", "collab", "bind", "init"}
+	for _, reservedName := range reserved {
+		if projectID == reservedName {
+			return fmt.Errorf("Project ID '%s' is reserved. Please choose a different ID", projectID)
+		}
+	}
+
+	return nil
+}
+
+// /* Tjekker om et projekt eksisterer. */
+func projectExists(projectID string) bool {
+	projectPath := filepath.Join(projectsPath, "projects", projectID, "project.yaml")
+	_, err := os.Stat(projectPath)
+	return !os.IsNotExist(err)
 }
 
 // /* Initialiserer 'project' kommandoen og dens underkommandoer. */
