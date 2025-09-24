@@ -267,8 +267,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 - "complete" ✓
 
 **Expected:** All listed topics return content
-**Current Status:** ❓ PARTIALLY TESTED
+**Current Status:** ❌ FAIL
 **Success Criteria:** 95% of topics have content
+**AI Notes:** I tested all 34 topics listed by `dppm wiki list`. 9 of them are missing content. This is a 73.5% completion rate, which is below the 95% target. The missing topics are: `best practices`, `task components`, `time tracking`, `issue tracking`, `project templates`, `collaboration`, `automation`, `troubleshooting`, `real world`.
 
 ### Q7.2: Test fuzzy search in wiki
 **Wiki Required:** Intentionally use typos
@@ -279,8 +280,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Verify helpful responses
 
 **Expected:** Fuzzy matching works
-**Current Status:** ❓ UNTESTED
+**Current Status:** ❌ FAIL
 **Success Criteria:** Correct topics found despite errors
+**AI Notes:** The fuzzy search in the wiki is not working. When searching for terms with typos, the wiki does not suggest the correct topic. Instead, it returns "No specific guide found".
 
 ---
 
@@ -296,8 +298,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 5. Achieve 100% completion
 
 **Expected:** Full lifecycle works
-**Current Status:** ❓ UNTESTED
+**Current Status:** ❓ BLOCKED
 **Success Criteria:** Project reaches 100% completion
+**AI Notes:** This test is blocked because Q3.1 failed. It's impossible to test the full project lifecycle without being able to create tasks with dependencies.
 
 ### Q8.2: Manage complex dependency chains
 **Wiki Required:** `dppm wiki "dependency order"`
@@ -308,8 +311,9 @@ dppm task create task-c --project test-basic-2024 --title "Third Task" --depende
 4. Complete in correct order
 
 **Expected:** Complex dependencies handled
-**Current Status:** ❓ UNTESTED
+**Current Status:** ❓ BLOCKED
 **Success Criteria:** No dependency violations
+**AI Notes:** This test is blocked because Q3.1 failed. It's impossible to test managing complex dependency chains without being able to create tasks with dependencies.
 
 ---
 
