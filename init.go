@@ -1,3 +1,5 @@
+/* ::GEMINI:01: Der er hardcoded stier her ('./dppm-test'), der bør bruges variabler eller en konfigurationsmekanisme for at gøre det mere fleksibelt.:: */
+/* ::GEMINI:02: Fejlhåndteringen kan forbedres ved at returnere mere specifikke fejltyper i stedet for generiske strenge.:: */
 package main
 
 import (
@@ -10,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// /* Definerer 'init' kommandoen for at initialisere et nyt projekt. */
 var initCmd = &cobra.Command{
 	Use:   "init [project-name]",
 	Short: "Initialize a new project with complete setup",
@@ -129,6 +132,7 @@ AI Integration:
 	},
 }
 
+// /* Opretter et DPPM-projekt ved at kalde 'dppm-test' kommandoen. */
 func createDPPMProject(projectID, projectName, docPath string) error {
 	// Use the existing project create command
 	cmd := exec.Command("./dppm-test", "project", "create", projectID, "--name", projectName)
@@ -144,10 +148,12 @@ func createDPPMProject(projectID, projectName, docPath string) error {
 	return nil
 }
 
+// /* Opretter en lokal projektmappe. */
 func createLocalProject(localDir string) error {
 	return os.MkdirAll(localDir, 0755)
 }
 
+// /* Opretter et symbolsk link til dokumentationen i Dropbox. */
 func setupDocumentationLink(projectID, localDir, docPath string) error {
 	dropboxDocsDir := filepath.Join(os.Getenv("HOME"), "Dropbox", "project-management", "projects", projectID, "docs")
 	localDocsDir := filepath.Join(localDir, "docs")
@@ -169,12 +175,14 @@ func setupDocumentationLink(projectID, localDir, docPath string) error {
 	return os.Symlink(dropboxDocsDir, localDocsDir)
 }
 
+// /* Initialiserer et Git-repository i den lokale projektmappe. */
 func initializeGitRepo(localDir string) error {
 	cmd := exec.Command("git", "init")
 	cmd.Dir = localDir
 	return cmd.Run()
 }
 
+// /* Opretter et GitHub-repository ved hjælp af 'gh' CLI-værktøjet. */
 func createGithubRepo(projectID, projectName, org string, private bool) error {
 	args := []string{"repo", "create", projectID, "--description", projectName}
 
@@ -196,6 +204,7 @@ func createGithubRepo(projectID, projectName, org string, private bool) error {
 	return nil
 }
 
+// /* Analyserer projektdokumentation for at oprette en passende projektstruktur. */
 func analyzeAndCreateStructure(projectID, docPath, template string) {
 	fmt.Printf("📄 Analyzing project documentation: %s\n", docPath)
 
@@ -233,6 +242,7 @@ func analyzeAndCreateStructure(projectID, docPath, template string) {
 	}
 }
 
+// /* Opretter en standard projektstruktur baseret på en skabelon. */
 func createDefaultStructure(projectID, template string) {
 	fmt.Printf("📋 Creating default project structure for template: %s\n", getTemplateOrDefault(template))
 
@@ -254,6 +264,7 @@ func createDefaultStructure(projectID, template string) {
 	}
 }
 
+// /* Analyserer projektindhold for at udlede relevante projektfaser. */
 func analyzeProjectPhases(content, template string) []string {
 	content = strings.ToLower(content)
 
@@ -274,7 +285,7 @@ func analyzeProjectPhases(content, template string) []string {
 	}
 
 	// Template-specific adjustments
-	switch template {
+	sswitch template {
 	case "web":
 		phases = []string{"Setup", "Backend", "Frontend", "Integration", "Deployment"}
 	case "api":
@@ -286,8 +297,9 @@ func analyzeProjectPhases(content, template string) []string {
 	return phases
 }
 
+// /* Returnerer en liste over standardfaser for en given skabelon. */
 func getDefaultPhases(template string) []string {
-	switch template {
+	sswitch template {
 	case "web":
 		return []string{"Setup", "Backend", "Frontend", "Integration"}
 	case "api":
@@ -299,6 +311,7 @@ func getDefaultPhases(template string) []string {
 	}
 }
 
+// /* Returnerer skabelonnavnet eller 'default', hvis det er tomt. */
 func getTemplateOrDefault(template string) string {
 	if template == "" {
 		return "default"
@@ -306,6 +319,7 @@ func getTemplateOrDefault(template string) string {
 	return template
 }
 
+// /* Henter GitHub-brugernavnet fra 'gh' CLI-værktøjet. */
 func getGithubUser(org string) string {
 	if org != "" {
 		return org
@@ -321,11 +335,13 @@ func getGithubUser(org string) string {
 	return strings.TrimSpace(string(output))
 }
 
+// /* Kontrollerer, om en fil eksisterer. */
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
 }
 
+// /* Kopierer en fil fra kilde til destination. */
 func copyFile(src, dst string) error {
 	input, err := os.ReadFile(src)
 	if err != nil {
@@ -335,6 +351,7 @@ func copyFile(src, dst string) error {
 	return os.WriteFile(dst, input, 0644)
 }
 
+// /* Initialiserer 'init' kommandoen og dens flag. */
 func init() {
 	initCmd.Flags().StringP("doc", "d", "", "Path to project documentation file")
 	initCmd.Flags().StringP("org", "o", "", "GitHub organization (optional)")

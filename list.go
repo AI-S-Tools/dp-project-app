@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// /* Definerer 'list' kommandoen for at liste projekter, faser eller opgaver. */
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List projects, phases, or tasks",
@@ -44,6 +45,7 @@ AI Usage:
   status reporting, and workflow automation.`,
 }
 
+// /* Definerer 'projects' underkommandoen for at liste alle projekter. */
 var listProjectsCmd = &cobra.Command{
 	Use:   "projects",
 	Short: "List all projects",
@@ -116,6 +118,7 @@ AI Integration:
 	},
 }
 
+// /* Initialiserer 'list' kommandoen og dens underkommandoer. */
 func init() {
 	listCmd.AddCommand(listProjectsCmd)
 }

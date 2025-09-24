@@ -1,3 +1,4 @@
+/* ::GEMINI:10: Koden kan optimeres betydeligt ved at flytte de store tekstblokke i `show...` funktionerne til eksterne filer for at reducere binærstørrelsen og forbedre vedligeholdelsen.:: */
 package main
 
 import (
@@ -13,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// /* Definerer 'collab' kommandoen til AI-samarbejde. */
 var collabCmd = &cobra.Command{
 	Use:   "collab",
 	Short: "AI collaboration system using DSL markers",
@@ -38,6 +40,7 @@ Examples:
   dppm collab wiki "task handoff"     # Learn about AI handoffs`,
 }
 
+// /* Definerer 'find' underkommandoen for at finde DSL-opgaver. */
 var collabFindCmd = &cobra.Command{
 	Use:   "find [path...]",
 	Short: "Find all DSL collaboration tasks",
@@ -61,6 +64,7 @@ The search excludes ai-dsl.sh and ai-dsl.md files automatically.`,
 	},
 }
 
+// /* Definerer 'clean' underkommandoen for at fjerne afsluttede opgaver. */
 var collabCleanCmd = &cobra.Command{
 	Use:   "clean [path...]",
 	Short: "Remove completed DSL collaboration tasks",
@@ -85,6 +89,7 @@ Safety: Creates backup files (.bak) before making changes.`,
 	},
 }
 
+// /* Definerer 'wiki' underkommandoen for at vise samarbejdsguider. */
 var collabWikiCmd = &cobra.Command{
 	Use:   "wiki [search-terms]",
 	Short: "AI collaboration guides and documentation",
@@ -110,6 +115,7 @@ Available Topics:
 	},
 }
 
+// /* Finder og viser alle AI-samarbejdsopgaver i de angivne stier. */
 func findCollabTasks(searchPaths []string) {
 	fmt.Println("🔍 Searching for AI collaboration tasks...")
 	fmt.Println("==========================================")
@@ -181,6 +187,7 @@ func findCollabTasks(searchPaths []string) {
 	fmt.Println("✅ Search complete.")
 }
 
+// /* Fjerner afsluttede samarbejdsopgaver fra markdown-filer. */
 func cleanCompletedTasks(searchPaths []string) {
 	fmt.Println("🧹 Cleaning completed collaboration tasks...")
 	fmt.Println("==========================================")
@@ -252,7 +259,7 @@ func cleanCompletedTasks(searchPaths []string) {
 				fmt.Printf("   🗑️  Removing blocks for ID: %s\n", id)
 
 				// Remove LARS and GEMINI blocks for this ID
-				taskRegex := regexp.MustCompile(fmt.Sprintf(`::(LARS|GEMINI):\s*%s\s*::.*?::\s*`, regexp.QuoteMeta(id)))
+			taskRegex := regexp.MustCompile(fmt.Sprintf(`::(LARS|GEMINI):\s*%s\s*::.*?::\s*`, regexp.QuoteMeta(id)))
 				updatedContent = taskRegex.ReplaceAllString(updatedContent, "")
 			}
 
@@ -288,6 +295,7 @@ func cleanCompletedTasks(searchPaths []string) {
 	}
 }
 
+// /* Viser hovedindekset for samarbejds-wikien. */
 func showCollabWikiIndex() {
 	fmt.Println(`AI Collaboration Wiki
 =====================
@@ -318,6 +326,7 @@ enabling AI teams to coordinate work within structured projects.
   dppm collab wiki "collaboration basics"`)
 }
 
+// /* Søger i samarbejds-wikien efter et bestemt emne. */
 func searchCollabWiki(searchTerm string) {
 	switch {
 	case strings.Contains(searchTerm, "collaboration basics") || strings.Contains(searchTerm, "introduction"):
@@ -341,6 +350,7 @@ func searchCollabWiki(searchTerm string) {
 	}
 }
 
+// /* Viser guiden til grundlæggende samarbejde. */
 func showCollabBasicsGuide() {
 	fmt.Println(`AI Collaboration Basics
 =======================
@@ -413,6 +423,7 @@ Documentation:
   • dppm collab wiki "task handoff"    # Handoff patterns`)
 }
 
+// /* Viser guiden til DSL-markører. */
 func showDSLMarkersGuide() {
 	fmt.Println(`DSL Markers Reference Guide
 ===========================
@@ -516,6 +527,7 @@ Maintenance:
   • dppm collab wiki "workflow patterns" # Common scenarios`)
 }
 
+// /* Viser guiden til opgaveoverdragelse. */
 func showTaskHandoffGuide() {
 	fmt.Println(`Task Handoff Patterns Guide
 ===========================
@@ -665,6 +677,7 @@ Unclear Deliverables:
   • dppm collab wiki "best practices"     # Proven strategies`)
 }
 
+// /* Viser guiden til arbejdsgangsmønstre. */
 func showWorkflowPatternsGuide() {
 	fmt.Println(`Collaboration Workflow Patterns
 ===============================
@@ -820,6 +833,7 @@ Use SPECIALIZATION when:
   • dppm collab wiki "integration"       # DPPM integration`)
 }
 
+// /* Viser guiden til bedste praksis. */
 func showBestPracticesGuide() {
 	fmt.Println(`AI Collaboration Best Practices
 ===============================
@@ -1004,6 +1018,7 @@ Collaboration Indicators:
   • dppm collab wiki "integration"      # DPPM integration`)
 }
 
+// /* Viser guiden til integration med DPPM. */
 func showIntegrationGuide() {
 	fmt.Println(`DPPM Integration Guide
 =====================
@@ -1208,6 +1223,7 @@ Quick Setup for New Project:
   • dppm status project PROJECT_NAME    # Combined status view`)
 }
 
+// /* Initialiserer 'collab' kommandoen og dens underkommandoer. */
 func init() {
 	collabCmd.AddCommand(collabFindCmd)
 	collabCmd.AddCommand(collabCleanCmd)
