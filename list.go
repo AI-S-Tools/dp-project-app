@@ -118,7 +118,93 @@ AI Integration:
 	},
 }
 
+// /* Definerer 'phases' underkommandoen for at liste faser for et projekt. */
+var listPhasesCmd = &cobra.Command{
+	Use:   "phases",
+	Short: "List phases for a project",
+	Long: `List Project Phases
+
+Display all phases (sprints) for a specific project. Shows detailed
+information about each phase including status, goals, and timeline.
+
+Information Displayed:
+  • Phase ID (unique identifier)
+  • Phase Name (human-readable name)
+  • Status (not_started, in_progress, completed, cancelled)
+  • Goal (phase objective)
+  • Start Date (if set)
+  • Due Date (if set)
+  • Task Count (number of tasks in phase)
+
+Output Format:
+  Phases are displayed in chronological order with clear separators
+  for easy reading by both humans and AI systems.
+
+Examples:
+  dppm list phases --project web-app       # List phases for web-app project
+  dppm list phases --project api-server    # List phases for api-server project
+
+Flags:
+  --project    Project ID to list phases for (required unless bound)`,
+	Run: func(cmd *cobra.Command, args []string) {
+		projectID, _ := cmd.Flags().GetString("project")
+
+		if projectID == "" {
+			fmt.Fprintf(os.Stderr, "❌ Error: No project specified. Use --project flag or bind to a project.\n")
+			return
+		}
+
+		projectDir := filepath.Join(projectsPath, "projects", projectID, "phases")
+
+		entries, err := os.ReadDir(projectDir)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "❌ Error reading phases directory for project %s: %v\n", projectID, err)
+			return
+		}
+
+		fmt.Printf("Phases for project: %s\n", projectID)
+		fmt.Println("========================")
+
+		if len(entries) == 0 {
+			fmt.Println("No phases found for this project.")
+			return
+		}
+
+		for _, entry := range entries {
+			if entry.IsDir() {
+				phaseFile := filepath.Join(projectDir, entry.Name(), "phase.yaml")
+
+				data, err := os.ReadFile(phaseFile)
+				if err != nil {
+					continue
+				}
+
+				var phase Phase
+				if err := yaml.Unmarshal(data, &phase); err != nil {
+					continue
+				}
+
+				fmt.Printf("ID: %s\n", phase.ID)
+				fmt.Printf("Name: %s\n", phase.Name)
+				fmt.Printf("Status: %s\n", phase.Status)
+				fmt.Printf("Goal: %s\n", phase.Goal)
+				if phase.StartDate != "" {
+					fmt.Printf("Start Date: %s\n", phase.StartDate)
+				}
+				if phase.EndDate != "" {
+					fmt.Printf("End Date: %s\n", phase.EndDate)
+				}
+				fmt.Printf("Updated: %s\n", phase.Updated)
+				fmt.Println("---")
+			}
+		}
+	},
+}
+
 // /* Initialiserer 'list' kommandoen og dens underkommandoer. */
 func init() {
+	listPhasesCmd.Flags().StringP("project", "p", "", "Project ID")
+
 	listCmd.AddCommand(listProjectsCmd)
+	listCmd.AddCommand(listPhasesCmd)
 }
