@@ -1,3 +1,5 @@
+/* ::GEMINI:07: De mange nestede structs (Component, Issue, Comment, etc.) gør 'Task' strukturen meget stor og kompleks. Overvej at opdele dem i separate filer for bedre organisering.:: */
+/* ::GEMINI:08: Funktionerne 'searchAndShowTask' og 'searchAndUpdateTask' har en lignende logik for at gennemgå mapper. Dette kan refaktoreres til en enkelt, genanvendelig søgefunktion.:: */
 package main
 
 import (
@@ -10,6 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// /* Definerer hovedstrukturen for en opgave. */
 type Task struct {
 	ID          string `yaml:"id"`
 	Title       string `yaml:"title"`
@@ -38,6 +41,7 @@ type Task struct {
 	Progress      Progress     `yaml:"progress,omitempty"`
 }
 
+// /* Definerer en komponent, som er en underdel af en opgave. */
 type Component struct {
 	ID          string `yaml:"id"`
 	Title       string `yaml:"title"`
@@ -49,6 +53,7 @@ type Component struct {
 	Updated     string `yaml:"updated"`
 }
 
+// /* Definerer et problem (issue) relateret til en opgave eller komponent. */
 type Issue struct {
 	ID              string `yaml:"id"`
 	Title           string `yaml:"title"`
@@ -63,6 +68,7 @@ type Issue struct {
 	Updated         string `yaml:"updated"`
 }
 
+// /* Definerer en kommentar til en opgave. */
 type Comment struct {
 	Timestamp string `yaml:"timestamp"`
 	Author    string `yaml:"author"`
@@ -70,12 +76,14 @@ type Comment struct {
 	Type      string `yaml:"type"`
 }
 
+// /* Definerer tidsregistrering for en opgave. */
 type TimeTracking struct {
 	EstimatedHours int       `yaml:"estimated_hours,omitempty"`
 	ActualHours    int       `yaml:"actual_hours,omitempty"`
 	TimeLogs       []TimeLog `yaml:"time_logs,omitempty"`
 }
 
+// /* Definerer en enkelt tidslog for en opgave. */
 type TimeLog struct {
 	Date        string  `yaml:"date"`
 	Hours       float32 `yaml:"hours"`
@@ -83,6 +91,7 @@ type TimeLog struct {
 	Author      string  `yaml:"author"`
 }
 
+// /* Definerer fremdriftsmetrikker for en opgave. */
 type Progress struct {
 	TotalComponents      int `yaml:"total_components"`
 	CompletedComponents  int `yaml:"completed_components"`
@@ -92,6 +101,7 @@ type Progress struct {
 	OpenBugs             int `yaml:"open_bugs"`
 }
 
+// /* Definerer 'task' kommandoen til opgavestyring. */
 var taskCmd = &cobra.Command{
 	Use:   "task",
 	Short: "Task management commands",
@@ -118,6 +128,7 @@ For more information about a specific command, use:
   dppm task [command] --help`,
 }
 
+// /* Definerer 'create' underkommandoen for at oprette en ny opgave. */
 var createTaskCmd = &cobra.Command{
 	Use:   "create [task-id]",
 	Short: "Create a new task",
@@ -229,6 +240,7 @@ Examples:
 	},
 }
 
+// /* Definerer 'show' underkommandoen for at vise detaljeret opgaveinformation. */
 var showTaskCmd = &cobra.Command{
 	Use:   "show [task-id]",
 	Short: "Display detailed task information",
@@ -258,6 +270,7 @@ Examples:
 	},
 }
 
+// /* Definerer 'update' underkommandoen for at opdatere en opgaves egenskaber. */
 var updateTaskCmd = &cobra.Command{
 	Use:   "update [task-id]",
 	Short: "Update task properties",
@@ -287,6 +300,7 @@ Examples:
 	},
 }
 
+// /* Søger efter og viser en opgave på tværs af alle projekter. */
 func searchAndShowTask(taskID string) {
 	projectsDir := filepath.Join(projectsPath, "projects")
 
@@ -320,6 +334,7 @@ func searchAndShowTask(taskID string) {
 	}
 }
 
+// /* Viser en specifik opgave fra et projekt og en fase. */
 func showTask(projectID, phaseID, taskID string) {
 	var taskFile string
 	if phaseID != "" {
@@ -362,6 +377,7 @@ func showTask(projectID, phaseID, taskID string) {
 	displayTask(task)
 }
 
+// /* Viser detaljeret information om en opgave. */
 func displayTask(task Task) {
 	fmt.Printf("Task: %s\n", task.ID)
 	fmt.Printf("================\n\n")
@@ -423,6 +439,7 @@ func displayTask(task Task) {
 	}
 }
 
+// /* Søger efter og opdaterer en opgave på tværs af alle projekter. */
 func searchAndUpdateTask(taskID string, cmd *cobra.Command) {
 	projectsDir := filepath.Join(projectsPath, "projects")
 	updated := false
@@ -455,6 +472,7 @@ func searchAndUpdateTask(taskID string, cmd *cobra.Command) {
 	}
 }
 
+// /* Opdaterer en specifik opgave i et projekt og en fase. */
 func updateTask(projectID, phaseID, taskID string, cmd *cobra.Command) {
 	var taskFile string
 	if phaseID != "" {
@@ -487,6 +505,7 @@ func updateTask(projectID, phaseID, taskID string, cmd *cobra.Command) {
 	}
 }
 
+// /* Opdaterer en opgavefil med nye værdier fra en kommando. */
 func updateTaskFile(taskFile string, cmd *cobra.Command) bool {
 	data, err := os.ReadFile(taskFile)
 	if err != nil {
@@ -548,6 +567,7 @@ func updateTaskFile(taskFile string, cmd *cobra.Command) bool {
 	return true
 }
 
+// /* Initialiserer 'task' kommandoen og dens underkommandoer. */
 func init() {
 	createTaskCmd.Flags().StringP("title", "t", "", "Task title")
 	createTaskCmd.Flags().StringP("project", "p", "", "Project ID (required)")
@@ -573,5 +593,5 @@ func init() {
 
 	taskCmd.AddCommand(createTaskCmd)
 	taskCmd.AddCommand(showTaskCmd)
-	taskCmd.AddCommand(updateTaskCmd)
+	ttaskCmd.AddCommand(updateTaskCmd)
 }

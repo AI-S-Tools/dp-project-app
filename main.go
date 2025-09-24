@@ -1,3 +1,5 @@
+/* ::GEMINI:03: Global variabel 'currentProjectConfig' kan føre til race conditions, hvis applikationen bliver multi-threaded i fremtiden. Overvej at overføre konfigurationen som en parameter.:: */
+/* ::GEMINI:04: Fejlhåndtering i 'main' funktionen kan forbedres ved at undgå 'os.Exit(1)' og i stedet returnere fejl, hvilket gør koden mere testbar.:: */
 package main
 
 import (
@@ -12,7 +14,7 @@ import (
 
 var version = "dev" // Will be set during build
 
-// Local project binding structures
+// /* Strukturer til lokal projektbinding. */
 type ProjectBinding struct {
 	ProjectID    string    `yaml:"project_id"`
 	DropboxPath  string    `yaml:"dropbox_path"`
@@ -35,9 +37,10 @@ type LocalProjectConfig struct {
 	} `yaml:"context"`
 }
 
-// Global variable to hold current project context
+// Global variabel til at holde den aktuelle projektkonfiguration
 var currentProjectConfig *LocalProjectConfig
 
+// /* Definerer rodkommandoen for DPPM CLI-værktøjet. */
 var rootCmd = &cobra.Command{
 	Use:   "dppm",
 	Short: "Dropbox Project Manager (DPPM)",
@@ -68,7 +71,7 @@ Storage Location: ~/Dropbox/project-management/
 
 📖 Getting Help:
   dppm wiki list                      # All available topics
-  dppm wiki "complete"                # Complete workflow example
+  dppm wiki complete                  # Complete workflow example
   dppm --help                         # Command reference
 
 Examples:
@@ -93,6 +96,7 @@ For detailed command help, use: dppm [command] --help`,
 
 var projectsPath string
 
+// /* Initialiserer stier og kommandoer. */
 func init() {
 	home, _ := os.UserHomeDir()
 	projectsPath = filepath.Join(home, "Dropbox", "project-management")
@@ -114,7 +118,7 @@ func init() {
 	rootCmd.Flags().BoolP("version", "v", false, "Show version information")
 }
 
-// findProjectBinding searches for .dppm/project.yaml in current and parent directories
+// /* Finder projektbindingen ved at søge efter .dppm/project.yaml. */
 func findProjectBinding() (string, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -140,7 +144,7 @@ func findProjectBinding() (string, error) {
 	return "", fmt.Errorf("no .dppm/project.yaml found in current or parent directories")
 }
 
-// loadProjectConfig loads the local project configuration
+// /* Indlæser den lokale projektkonfiguration fra en fil. */
 func loadProjectConfig(configPath string) (*LocalProjectConfig, error) {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
@@ -155,7 +159,7 @@ func loadProjectConfig(configPath string) (*LocalProjectConfig, error) {
 	return &config, nil
 }
 
-// saveProjectConfig saves the local project configuration
+// /* Gemmer den lokale projektkonfiguration til en fil. */
 func saveProjectConfig(configPath string, config *LocalProjectConfig) error {
 	config.Binding.LastSync = time.Now()
 
@@ -176,7 +180,7 @@ func saveProjectConfig(configPath string, config *LocalProjectConfig) error {
 	return nil
 }
 
-// getCurrentProjectID returns the current project ID from local binding
+// /* Returnerer det aktuelle projekt-ID fra den lokale binding. */
 func getCurrentProjectID() string {
 	if currentProjectConfig == nil {
 		return ""
@@ -184,7 +188,7 @@ func getCurrentProjectID() string {
 	return currentProjectConfig.Binding.ProjectID
 }
 
-// createProjectBinding creates a new .dppm/project.yaml in current directory
+// /* Opretter en ny .dppm/project.yaml-fil i den aktuelle mappe. */
 func createProjectBinding(projectID string) error {
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -231,6 +235,7 @@ func createProjectBinding(projectID string) error {
 	return nil
 }
 
+// /* Definerer 'bind' kommandoen for at binde den aktuelle mappe til et projekt. */
 var bindCmd = &cobra.Command{
 	Use:   "bind [project-id]",
 	Short: "Bind current directory to an existing DPPM project",
@@ -274,7 +279,7 @@ After binding, all DPPM commands will automatically use this project:
 	},
 }
 
-// requireProjectBinding ensures we have a project binding or exits with error
+// /* Kræver en projektbinding, ellers afsluttes programmet med en fejl. */
 func requireProjectBinding() {
 	if currentProjectConfig == nil {
 		fmt.Fprintf(os.Stderr, "❌ Error: No DPPM project found in current directory.\n\n")
@@ -287,6 +292,7 @@ func requireProjectBinding() {
 	}
 }
 
+// /* Hovedfunktionen for DPPM-applikationen. */
 func main() {
 	// Check for version flag first
 	for _, arg := range os.Args {
@@ -367,6 +373,7 @@ func main() {
 	}
 }
 
+// /* Viser en opstartsguide, når der ikke er angivet nogen kommandoer. */
 func showStartupGuide() {
 	fmt.Println(`DPPM - Dropbox Project Manager
 ==============================

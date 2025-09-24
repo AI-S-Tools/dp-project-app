@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// /* Definerer strukturen for et projekt. */
 type Project struct {
 	ID           string                 `yaml:"id"`
 	Name         string                 `yaml:"name"`
@@ -26,6 +27,7 @@ type Project struct {
 	Phases       []string               `yaml:"phases,omitempty"`
 }
 
+// /* Definerer 'project' kommandoen til projektstyring. */
 var projectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "Project management commands",
@@ -56,6 +58,7 @@ For more information about a specific command, use:
   dppm project [command] --help`,
 }
 
+// /* Definerer 'create' underkommandoen for at oprette et nyt projekt. */
 var createProjectCmd = &cobra.Command{
 	Use:   "create [project-id]",
 	Short: "Create a new project",
@@ -149,6 +152,7 @@ AI Usage Tips:
 	},
 }
 
+// /* Initialiserer 'project' kommandoen og dens underkommandoer. */
 func init() {
 	createProjectCmd.Flags().StringP("name", "n", "", "Project name")
 	createProjectCmd.Flags().StringP("description", "d", "", "Project description")

@@ -1,3 +1,4 @@
+/* ::GEMINI:05: Filnavnet 'sprint.go' er misvisende, da det håndterer 'Phases'. Overvej at omdøbe filen til 'phase.go' for at afspejle dens faktiske formål. */
 package main
 
 import (
@@ -10,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// /* Definerer strukturen for en fase (sprint). */
 type Phase struct {
 	ID        string       `yaml:"id"`
 	Name      string       `yaml:"name"`
@@ -26,6 +28,7 @@ type Phase struct {
 	Notes     string       `yaml:"notes,omitempty"`
 }
 
+// /* Definerer metrikker for en fase. */
 type PhaseMetrics struct {
 	CompletedTasks       int `yaml:"completed_tasks"`
 	TotalTasks           int `yaml:"total_tasks"`
@@ -33,6 +36,7 @@ type PhaseMetrics struct {
 	StoryPointsTotal     int `yaml:"story_points_total"`
 }
 
+// /* Definerer 'phase' kommandoen til fasestyring. */
 var phaseCmd = &cobra.Command{
 	Use:   "phase",
 	Short: "Phase management commands",
@@ -67,6 +71,7 @@ For more information about a specific command, use:
   dppm phase [command] --help`,
 }
 
+// /* Definerer 'create' underkommandoen for at oprette en ny fase. */
 var createPhaseCmd = &cobra.Command{
 	Use:   "create [phase-id]",
 	Short: "Create a new phase",
@@ -164,6 +169,7 @@ Examples:
 	},
 }
 
+// /* Initialiserer 'phase' kommandoen og dens underkommandoer. */
 func init() {
 	createPhaseCmd.Flags().StringP("name", "n", "", "Phase name")
 	createPhaseCmd.Flags().StringP("project", "p", "", "Project ID (required)")

@@ -1,3 +1,4 @@
+/* ::GEMINI:06: Koden i 'loadProjectTasks' og 'loadTasksFromDir' er næsten identisk og kan refaktoreres til en enkelt, mere generisk funktion for at undgå gentagelse.:: */
 package main
 
 import (
@@ -10,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// /* Definerer 'status' kommandoen for at vise projektstatus. */
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show project status and dependency information",
@@ -32,6 +34,7 @@ Examples:
   dppm status active --project dash-lxd`,
 }
 
+// /* Definerer 'project' underkommandoen for at vise en oversigt over projektstatus. */
 var statusProjectCmd = &cobra.Command{
 	Use:   "project [project-id]",
 	Short: "Show project status overview",
@@ -97,6 +100,7 @@ var statusProjectCmd = &cobra.Command{
 	},
 }
 
+// /* Definerer 'blocked' underkommandoen for at vise alle blokerede opgaver. */
 var statusBlockedCmd = &cobra.Command{
 	Use:   "blocked",
 	Short: "Show all blocked tasks",
@@ -115,6 +119,7 @@ Shows which tasks are blocking each blocked task.`,
 	},
 }
 
+// /* Definerer 'dependencies' underkommandoen for at vise alle afhængighedskæder. */
 var statusDependenciesCmd = &cobra.Command{
 	Use:   "dependencies",
 	Short: "Show all dependency chains",
@@ -133,6 +138,7 @@ Shows the dependency graph and highlights potential issues.`,
 	},
 }
 
+// /* Indlæser alle opgaver for et givet projekt. */
 func loadProjectTasks(projectID string) ([]Task, error) {
 	var tasks []Task
 
@@ -160,6 +166,7 @@ func loadProjectTasks(projectID string) ([]Task, error) {
 	return tasks, nil
 }
 
+// /* Indlæser opgaver fra en bestemt mappe. */
 func loadTasksFromDir(tasksDir string) ([]Task, error) {
 	var tasks []Task
 
@@ -189,6 +196,7 @@ func loadTasksFromDir(tasksDir string) ([]Task, error) {
 	return tasks, nil
 }
 
+// /* Kontrollerer, om en opgave er blokeret af ufærdige afhængigheder. */
 func isTaskBlocked(task Task, allTasks []Task) bool {
 	if len(task.DependencyIDs) == 0 {
 		return false
@@ -210,6 +218,7 @@ func isTaskBlocked(task Task, allTasks []Task) bool {
 	return false
 }
 
+// /* Henter en liste over de opgaver, der blokerer en given opgave. */
 func getBlockingTasks(task Task, allTasks []Task) []string {
 	var blockers []string
 
@@ -229,6 +238,7 @@ func getBlockingTasks(task Task, allTasks []Task) []string {
 	return blockers
 }
 
+// /* Viser alle blokerede opgaver for et specifikt projekt. */
 func showBlockedTasksForProject(projectID string) {
 	tasks, err := loadProjectTasks(projectID)
 	if err != nil {
@@ -237,7 +247,7 @@ func showBlockedTasksForProject(projectID string) {
 	}
 
 	fmt.Printf("Blocked Tasks in %s:\n", projectID)
-	fmt.Println("========================")
+	fmt.Println("=======================")
 
 	hasBlocked := false
 	for _, task := range tasks {
@@ -256,6 +266,7 @@ func showBlockedTasksForProject(projectID string) {
 	}
 }
 
+// /* Viser alle blokerede opgaver på tværs af alle projekter. */
 func showAllBlockedTasks() {
 	projectsDir := filepath.Join(projectsPath, "projects")
 
@@ -275,6 +286,7 @@ func showAllBlockedTasks() {
 	}
 }
 
+// /* Viser afhængighedskæderne for et specifikt projekt. */
 func showDependenciesForProject(projectID string) {
 	tasks, err := loadProjectTasks(projectID)
 	if err != nil {
@@ -307,6 +319,7 @@ func showDependenciesForProject(projectID string) {
 	}
 }
 
+// /* Viser alle afhængighedskæder på tværs af alle projekter. */
 func showAllDependencies() {
 	projectsDir := filepath.Join(projectsPath, "projects")
 
@@ -323,6 +336,7 @@ func showAllDependencies() {
 	}
 }
 
+// /* Initialiserer 'status' kommandoen og dens underkommandoer. */
 func init() {
 	statusBlockedCmd.Flags().StringP("project", "p", "", "Show blocked tasks for specific project")
 	statusDependenciesCmd.Flags().StringP("project", "p", "", "Show dependencies for specific project")
