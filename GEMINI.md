@@ -12,41 +12,49 @@ This project is actively managed using DPPM itself. Current project status:
 
 - **Project ID**: `dp-project-app`
 - **Name**: DPPM - Dropbox Project Manager
-- **Status**: Active Development
+- **Status**: ⚠️ **CRITICAL ISSUES - v1.1.1 RELEASE CANCELLED**
 - **Total Tasks**: 44 (9 completed, 35 ready to start)
-- **Health**: ✅ No blocked tasks, excellent project health
-- **Completion**: 20.5% done, 79.5% ready for implementation
+- **Health**: 🔴 **12 CRITICAL BUGS** blocking release (see GitHub issues #20-31)
+- **Completion**: 20.5% done, but **13% functionality test success rate**
 
 ### Current Development Focus
 
-**6 Active Phases:**
-1. **Core Development** - ✅ **COMPLETE** - All basic project/phase/task management functionality implemented
-2. **AI Collaboration System** - ✅ **CORE COMPLETE** - DSL markers, collaboration detection, wiki integration done
-3. **Feature Enhancements** - 📋 **PLANNED** - 20+ enhancement features ready for implementation
-4. **Bug Fixes** - 🔴 **4 CRITICAL BUGS** - Init command, local binding issues identified
-5. **Deployment** - ✅ **PRODUCTION READY** - Multi-platform binaries, GitHub Actions, Homebrew tap
-6. **Milestones Extension** - 📋 **PLANNED** - Core milestone system designed
+**⚠️ CRITICAL UPDATE (2025-09-24T19:05:00Z):**
+
+Testing revealed **12 critical bugs** that must be fixed before any release:
+
+**🔴 COMPLETELY BROKEN COMMANDS:**
+- `dppm init` - Binary path bug (Issue #20)
+- `dppm bind` - Command doesn't exist (Issue #26)
+- `dppm list active` - Command doesn't exist (Issue #27)
+- `dppm status active` - Command doesn't exist (Issue #27)
+- `dppm list phases` - Command doesn't exist (Issue #24)
+- `dppm collab clean` - Not working correctly (Issue #28)
+
+**🟠 PARTIALLY BROKEN FEATURES:**
+- Local binding auto-scoping - Doesn't work (Issue #21)
+- Task dependencies - Flag mismatch (Issue #22, #25)
+- Wiki fuzzy search - Not working (Issue #30)
+- Wiki completeness - 9 topics missing (Issue #29)
+- Error handling - Fundamental flaws (Issue #31)
 
 ### Key Tasks Ready for Work
 
-**🔴 Critical Priority:**
-- Fix init command binary path bug (calls ./dppm-test instead of dppm)
+**🚨 MUST FIX BEFORE ANY RELEASE:**
+1. Fix init command binary path bug (Issue #20)
+2. Implement missing `dppm bind` command (Issue #26)
+3. Add missing `dppm list active` command (Issue #27)
+4. Add missing `dppm status active` command (Issue #27)
+5. Add missing `dppm list phases` command (Issue #24)
+6. Fix `dppm collab clean` (Issue #28)
+7. Fix local binding auto-scoping (Issue #21)
+8. Fix task dependency flags (Issues #22, #25)
+9. Fix wiki fuzzy search (Issue #30)
+10. Add 9 missing wiki topics (Issue #29)
+11. Fix fundamental error handling (Issue #31)
+12. Fix local binding project name sync (Issue #23)
 
-**🟠 High Priority:**
-- AI Rules System with hierarchical rule management
-- DPPM MCP Server for AI integration
-- Core Milestone System implementation
-- Local binding auto-scoping fix
-- Advanced dependency management system
-
-**🟡 Medium Priority:**
-- Missing list subcommands (phases, tasks)
-- Missing phase subcommands (list, show, update)
-- Missing task subcommands (list, component, issue, dependency)
-- Enhanced status reporting and visualization
-- Task templates and bulk operations
-- Git integration workflow
-- Phase numbering system (fase-1, fase-2, etc.)
+**⚠️ DO NOT START NEW FEATURES** until critical bugs are fixed!
 
 ## Build and Development
 
@@ -132,31 +140,37 @@ var createProjectCmd = &cobra.Command{
 # Build test binary
 go build -o dppm-test
 
+# ⚠️ WARNING: Many commands are broken! See issues #20-31
+
 # Test with DPPM project management
-./dppm-test status project dp-project-app
-./dppm-test task create new-feature --project dp-project-app --phase core-development
+./dppm-test status project dp-project-app  # ✅ Works
+./dppm-test task create new-feature --project dp-project-app --phase core-development  # ✅ Works
 
 # Test local binding functionality (new in v1.1.0)
 go build -o dppm-test-local
-./dppm-test-local bind dp-project-app
-./dppm-test-local status project dp-project-app
+./dppm-test-local bind dp-project-app  # ⚠️ Auto-scoping broken (Issue #21)
+./dppm-test-local status project dp-project-app  # ❌ Still requires --project flag
 
 # Always test help systems and wiki
-./dppm-test --help
-./dppm-test wiki "getting started"
-./dppm-test wiki list
+./dppm-test --help  # ✅ Works
+./dppm-test wiki "getting started"  # ✅ Works
+./dppm-test wiki list  # ✅ Works
 
 # Test comprehensive expectations (available in docs/test/)
-# See docs/test/expectation.yaml for complete test specification
+# ⚠️ CRITICAL: See docs/test/expectation.yaml - Only 13% test success rate!
 # See docs/test/wiki.md for all wiki texts and help content
 ```
 
 ## Release Process
 
-Releases are automated via GitHub Actions:
+**⚠️ RELEASE v1.1.1 CANCELLED DUE TO CRITICAL BUGS**
+
+When bugs are fixed, releases are automated via GitHub Actions:
 - Tag format: `v1.0.0`
 - Multi-platform binaries: Linux, macOS, Windows (amd64, arm64)
 - Homebrew tap: `AI-S-Tools/dp-project-app`
+
+**DO NOT CREATE ANY RELEASE TAGS UNTIL ALL 12 ISSUES ARE RESOLVED!**
 
 ## Integration with MCP (High Priority)
 
@@ -167,30 +181,54 @@ The project includes active development of MCP (Model Context Protocol) server i
 ## New Features in v1.1.0
 
 ### Local Project Binding
-- **Status:** ✅ Implemented, testing in progress
+- **Status:** ❌ **BROKEN** - Multiple critical issues
 - **Feature:** `.dppm/project.yaml` binding system
-- **Command:** `dppm bind PROJECT_ID`
-- **Benefits:** Eliminates need for `--project` flags, prevents cross-project task creation
-- **Known Issues:** Auto-scoping not fully integrated in all commands
+- **Command:** `dppm bind PROJECT_ID` - **DOESN'T EXIST** (Issue #26)
+- **Benefits:** Would eliminate need for `--project` flags if working
+- **Known Issues:**
+  - `dppm bind` command missing entirely (Issue #26)
+  - Auto-scoping completely broken (Issue #21)
+  - Project name not synced from Dropbox (Issue #23)
 
 ### Comprehensive Testing Framework
-- **Status:** ✅ Complete
+- **Status:** ✅ Test framework complete, ❌ Tests failing
 - **Files:**
-  - `docs/test/expectation.yaml` - 45+ comprehensive test cases
+  - `docs/test/expectation.yaml` - 45+ comprehensive test cases (**13% pass rate**)
   - `docs/test/wiki.md` - Complete collection of all wiki texts and help texts
+- **Test Results (2025-09-24):**
+  - **6 tests passing** (13%)
+  - **27 tests failing** (60%)
+  - **12 GitHub issues created** for critical bugs
 - **Coverage:** Init workflow, project lifecycle, stability tests, all wiki functions
 
 ### AI Collaboration System
-- **Status:** ✅ Core features complete
+- **Status:** ⚠️ Partially working
 - **Features:** DSL markers, collaboration detection, wiki integration
-- **Commands:** `dppm collab find`, `dppm collab wiki`
+- **Commands:**
+  - `dppm collab find` - ✅ Works
+  - `dppm collab wiki` - ✅ Works
+  - `dppm collab clean` - ❌ **BROKEN** (Issue #28)
 
 ## Contributing Guidelines
 
-1. **Use DPPM**: Track your work in the DPPM project itself
-2. **Follow Go Patterns**: Consistent with existing cobra command structure
-3. **AI-First Design**: All features should enhance AI development workflows
-4. **Comprehensive Help**: Every command needs detailed help and examples
-5. **YAML-Based Storage**: Maintain the Dropbox-synchronized YAML approach
+**⚠️ PRIORITY: FIX THE 12 CRITICAL BUGS BEFORE ANY NEW DEVELOPMENT**
+
+1. **Fix Bugs First**: Address GitHub issues #20-31 before new features
+2. **Test Everything**: Run comprehensive tests from `docs/test/expectation.yaml`
+3. **Follow Go Patterns**: Consistent with existing cobra command structure
+4. **AI-First Design**: All features should enhance AI development workflows
+5. **Comprehensive Help**: Every command needs detailed help and examples
+6. **YAML-Based Storage**: Maintain the Dropbox-synchronized YAML approach
+
+**Critical Test Commands Before Any PR:**
+```bash
+# These MUST work without errors:
+./dppm-test init test-project --skip-github
+./dppm-test bind test-project
+./dppm-test list active
+./dppm-test status active
+./dppm-test list phases
+./dppm-test collab clean
+```
 
 For detailed implementation guidance, see `CLAUDE.md` for Claude-specific instructions.
