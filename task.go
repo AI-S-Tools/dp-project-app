@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -152,11 +153,24 @@ Examples:
 		description, _ := cmd.Flags().GetString("description")
 		priority, _ := cmd.Flags().GetString("priority")
 		assignee, _ := cmd.Flags().GetString("assignee")
+		dependencyIDsStr, _ := cmd.Flags().GetString("dependency-ids")
 
 		// Validate that project ID is available (either from flag or local binding)
 		if projectID == "" {
 			fmt.Fprintf(os.Stderr, "Error: project is required. Either use --project flag or run 'dppm bind PROJECT_ID' to set local project context.\n")
 			return
+		}
+
+		// Parse dependency IDs
+		var dependencyIDs []string
+		if dependencyIDsStr != "" {
+			// Split by comma and trim spaces
+			for _, id := range strings.Split(dependencyIDsStr, ",") {
+				trimmedID := strings.TrimSpace(id)
+				if trimmedID != "" {
+					dependencyIDs = append(dependencyIDs, trimmedID)
+				}
+			}
 		}
 
 		if title == "" {
@@ -188,7 +202,7 @@ Examples:
 			Description:   description,
 			Components:    []Component{},
 			Issues:        []Issue{},
-			DependencyIDs: []string{},
+			DependencyIDs: dependencyIDs,
 			BlockedBy:     []string{},
 			Blocking:      []string{},
 			Labels:        []string{},
@@ -223,6 +237,9 @@ Examples:
 		fmt.Printf("Task '%s' created successfully in project '%s'\n", taskID, projectID)
 		if phaseID != "" {
 			fmt.Printf("Assigned to phase: %s\n", phaseID)
+		}
+		if len(dependencyIDs) > 0 {
+			fmt.Printf("Dependencies: %s\n", strings.Join(dependencyIDs, ", "))
 		}
 	},
 }
@@ -690,6 +707,7 @@ func init() {
 	createTaskCmd.Flags().StringP("description", "d", "", "Task description")
 	createTaskCmd.Flags().String("priority", "medium", "Task priority (low, medium, high, critical)")
 	createTaskCmd.Flags().StringP("assignee", "a", "", "Task assignee")
+	createTaskCmd.Flags().String("dependency-ids", "", "Comma-separated list of task IDs this task depends on")
 
 	// Project flag will be handled manually in Run function to allow auto-scoping from local binding
 	// createTaskCmd.MarkFlagRequired("project")

@@ -117,8 +117,25 @@ func main() {
 
 func showStartupGuide() {
 	fmt.Println(`DPPM - Dropbox Project Manager
-==============================
+==============================`)
 
+	// Check for local project binding and display context
+	if context, err := getLocalProjectContext(); err == nil && context != nil {
+		fmt.Println()
+		if context.ProjectName != "" {
+			fmt.Printf("🎯 Current DPPM Project: %s\n", context.ProjectName)
+		} else {
+			fmt.Printf("🎯 Current DPPM Project: %s\n", context.ProjectID)
+		}
+		fmt.Printf("📁 Project ID: %s\n", context.ProjectID)
+		fmt.Printf("🔗 Dropbox Path: %s\n", context.DropboxPath)
+		fmt.Println()
+		fmt.Println("💡 Project-scoped commands will use this project automatically.")
+		fmt.Println("   Use 'rm -rf .dppm' to unbind if needed.")
+		fmt.Println()
+	}
+
+	fmt.Println(`
 🎯 You're running DPPM without any commands. Here's what you can do:
 
 📚 GET HELP & LEARN:
