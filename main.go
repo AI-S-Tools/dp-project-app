@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 var version = "dev" // Will be set during build
@@ -150,4 +151,64 @@ DPPM is designed for AI workflows. The wiki system contains comprehensive
 guides for every feature. Use it to get detailed, actionable information.
 
 Try: dppm wiki "project workflow" to see a complete example!`)
+}
+
+// LocalProjectBinding represents the local project context
+type LocalProjectBinding struct {
+	ProjectID   string `yaml:"project_id"`
+	ProjectName string `yaml:"project_name,omitempty"`
+	DropboxPath string `yaml:"dropbox_path,omitempty"`
+	Created     string `yaml:"created,omitempty"`
+}
+
+// getLocalProjectContext reads the local .dppm/project.yaml file if it exists
+func getLocalProjectContext() (*LocalProjectBinding, error) {
+	bindingFile := ".dppm/project.yaml"
+	if _, err := os.Stat(bindingFile); os.IsNotExist(err) {
+		return nil, nil // No local binding exists
+	}
+
+	data, err := os.ReadFile(bindingFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read binding file: %v", err)
+	}
+
+	// Try to parse as LocalProjectBinding first
+	var binding LocalProjectBinding
+	if err := yaml.Unmarshal(data, &binding); err != nil {
+		// If that fails, try to extract project ID from regular project metadata
+		var projectData map[string]interface{}
+		if err := yaml.Unmarshal(data, &projectData); err != nil {
+			return nil, fmt.Errorf("failed to parse binding file: %v", err)
+		}
+
+		// Extract project ID from the YAML structure
+		if id, ok := projectData["id"].(string); ok {
+			binding.ProjectID = id
+		}
+		if name, ok := projectData["name"].(string); ok {
+			binding.ProjectName = name
+		}
+	}
+
+	if binding.ProjectID == "" {
+		return nil, fmt.Errorf("no project ID found in binding file")
+	}
+
+	return &binding, nil
+}
+
+// setDefaultProjectFlag sets the project flag to the local context if not explicitly provided
+func setDefaultProjectFlag(cmd *cobra.Command, flagName string) {
+	if cmd.Flags().Changed(flagName) {
+		return // Flag was explicitly set by user
+	}
+
+	context, err := getLocalProjectContext()
+	if err != nil || context == nil {
+		return // No local context available
+	}
+
+	// Set the project flag to the local context value
+	cmd.Flags().Set(flagName, context.ProjectID)
 }

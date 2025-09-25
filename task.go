@@ -142,6 +142,9 @@ Examples:
   Descriptions help other AI agents understand task requirements and scope.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		// Set default project from local context if not explicitly provided
+		setDefaultProjectFlag(cmd, "project")
+
 		taskID := args[0]
 		title, _ := cmd.Flags().GetString("title")
 		projectID, _ := cmd.Flags().GetString("project")
@@ -234,6 +237,9 @@ Examples:
   dppm task show file-ops --project web-app`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		// Set default project from local context if not explicitly provided
+		setDefaultProjectFlag(cmd, "project")
+
 		taskID := args[0]
 		projectID, _ := cmd.Flags().GetString("project")
 
@@ -264,6 +270,9 @@ Examples:
   dppm task update bug-fix --status done --description "Fixed login issue"`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		// Set default project from local context if not explicitly provided
+		setDefaultProjectFlag(cmd, "project")
+
 		taskID := args[0]
 		projectID, _ := cmd.Flags().GetString("project")
 

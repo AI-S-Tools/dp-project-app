@@ -91,6 +91,9 @@ Examples:
   dppm phase create backend-v2 --project web-app --name "Backend Version 2" --goal "Complete API redesign"`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		// Set default project from local context if not explicitly provided
+		setDefaultProjectFlag(cmd, "project")
+
 		phaseID := args[0]
 		name, _ := cmd.Flags().GetString("name")
 		projectID, _ := cmd.Flags().GetString("project")
