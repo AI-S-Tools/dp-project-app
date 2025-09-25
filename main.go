@@ -96,6 +96,13 @@ func init() {
 }
 
 func main() {
+	// Initialize ERD database
+	if err := initDatabase(); err != nil {
+		fmt.Fprintf(os.Stderr, "Database initialization failed: %v\n", err)
+		os.Exit(1)
+	}
+	defer closeDatabase()
+
 	// Check for version flag first
 	for _, arg := range os.Args {
 		if arg == "--version" || arg == "-v" {
