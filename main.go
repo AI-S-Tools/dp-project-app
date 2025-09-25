@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -84,6 +85,9 @@ func init() {
 	// Add --wiki flag for direct search
 	rootCmd.Flags().String("wiki", "", "Search DPPM knowledge base (e.g. --wiki \"create task\")")
 
+	// Add --link flag for project documentation linking
+	rootCmd.Flags().String("link", "", "Create symlink to project docs folder (e.g. --link \"project-name\")")
+
 	// Add version flag
 	rootCmd.Flags().BoolP("version", "v", false, "Show version information")
 }
@@ -105,6 +109,16 @@ func main() {
 			// Execute wiki search directly
 			wikiQuery := os.Args[i+1]
 			wikiCmd.Run(wikiCmd, []string{wikiQuery})
+			return
+		}
+	}
+
+	// Check for --link flag in args before executing
+	for i, arg := range os.Args {
+		if arg == "--link" && i+1 < len(os.Args) {
+			// Execute project docs linking directly
+			projectName := os.Args[i+1]
+			createProjectDocsLink(projectName)
 			return
 		}
 	}
@@ -318,4 +332,79 @@ To unbind, simply remove the .dppm directory: rm -rf .dppm`,
 		fmt.Println()
 		fmt.Println("💡 To unbind: rm -rf .dppm")
 	},
+}
+
+func createProjectDocsLink(projectID string) {
+	// Check if project exists
+	projectPath := filepath.Join(projectsPath, "projects", projectID)
+	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "Error: Project '%s' does not exist.\n", projectID)
+		fmt.Fprintf(os.Stderr, "Use 'dppm list projects' to see available projects.\n")
+		return
+	}
+
+	// Create docs directory in project if it doesn't exist
+	docsPath := filepath.Join(projectPath, "docs")
+	if err := os.MkdirAll(docsPath, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating docs directory: %v\n", err)
+		return
+	}
+
+	// Remove existing symlink if it exists
+	symlinkPath := "./dbdocs"
+	if _, err := os.Lstat(symlinkPath); err == nil {
+		if err := os.Remove(symlinkPath); err != nil {
+			fmt.Fprintf(os.Stderr, "Error removing existing symlink: %v\n", err)
+			return
+		}
+		fmt.Println("🗑️  Removed existing symlink 'dbdocs'")
+	}
+
+	// Create new symlink
+	if err := os.Symlink(docsPath, symlinkPath); err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating symlink: %v\n", err)
+		return
+	}
+
+	// Add to .gitignore if it exists or create it
+	gitignoreFile := "./.gitignore"
+
+	// Read existing .gitignore if it exists
+	if existingContent, err := os.ReadFile(gitignoreFile); err == nil {
+		// Check if dbdocs is already in .gitignore
+		if !strings.Contains(string(existingContent), "dbdocs") {
+			// Append to existing .gitignore
+			file, err := os.OpenFile(gitignoreFile, os.O_APPEND|os.O_WRONLY, 0644)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Warning: Could not update .gitignore: %v\n", err)
+			} else {
+				defer file.Close()
+				if _, err := file.WriteString("\n# DPPM project docs symlink\ndbdocs\n"); err != nil {
+					fmt.Fprintf(os.Stderr, "Warning: Could not write to .gitignore: %v\n", err)
+				} else {
+					fmt.Println("📝 Added 'dbdocs' to .gitignore")
+				}
+			}
+		} else {
+			fmt.Println("📝 'dbdocs' already exists in .gitignore")
+		}
+	} else {
+		// Create new .gitignore
+		if err := os.WriteFile(gitignoreFile, []byte("# DPPM project docs symlink\ndbdocs\n"), 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: Could not create .gitignore: %v\n", err)
+		} else {
+			fmt.Println("📝 Created .gitignore with 'dbdocs' entry")
+		}
+	}
+
+	fmt.Printf("✅ Created symlink 'dbdocs' → %s\n", docsPath)
+	fmt.Printf("📁 Project: %s\n", projectID)
+	fmt.Printf("🔗 Docs Path: %s\n", docsPath)
+	fmt.Println()
+	fmt.Println("📚 You can now access project documentation via the 'dbdocs' symlink:")
+	fmt.Println("   ls dbdocs/")
+	fmt.Println("   code dbdocs/")
+	fmt.Println("   echo 'Project notes' > dbdocs/notes.md")
+	fmt.Println()
+	fmt.Println("💡 The symlink is automatically ignored by git via .gitignore")
 }
