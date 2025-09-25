@@ -60,7 +60,10 @@ Examples:
 DPPM is designed for AI-driven workflows. Use the wiki system for comprehensive
 guidance on all features and best practices.
 
-For detailed command help, use: dppm [command] --help`,
+For detailed command help, use: dppm [command] --help
+
+🐛 Found a bug or missing feature?
+Report issues: https://github.com/AI-S-Tools/dp-project-app/issues`,
 	Run: func(cmd *cobra.Command, args []string) {
 		showStartupGuide()
 	},

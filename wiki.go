@@ -170,6 +170,12 @@ func searchWiki(searchTerm string) {
 		showAIWorkflowGuide()
 	case strings.Contains(searchLower, "ai collaboration") || strings.Contains(searchLower, "dsl markers"):
 		showAICollaborationGuide()
+	case strings.Contains(searchLower, "task numbering") || strings.Contains(searchLower, "numbering") || strings.Contains(searchLower, "sequential"):
+		showTaskNumberingGuide()
+	case strings.Contains(searchLower, "iterative") || strings.Contains(searchLower, "iterativ") || strings.Contains(searchLower, "task building"):
+		showIterativeTaskGuide()
+	case strings.Contains(searchLower, "verbose task") || strings.Contains(searchLower, "ai task") || strings.Contains(searchLower, "long description"):
+		showVerboseTaskGuide()
 	default:
 		fmt.Printf("No specific guide found for '%s'\n\n", searchTerm)
 		fmt.Println("Try one of these common searches:")
