@@ -13,19 +13,35 @@ var db *sql.DB
 
 // initDatabase initializes the SQLite database with ERD schema
 func initDatabase() error {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("failed to get home directory: %v", err)
+	// Check if we're in a bound project directory
+	context, err := getLocalProjectContext()
+	if err != nil || context == nil {
+		// No local binding - use global database for now
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return fmt.Errorf("failed to get home directory: %v", err)
+		}
+		dbPath := filepath.Join(home, "Dropbox", "project-management", "dppm-global.db")
+		dataDir := filepath.Dir(dbPath)
+		if err := os.MkdirAll(dataDir, 0755); err != nil {
+			return fmt.Errorf("failed to create data directory: %v", err)
+		}
+		return openDatabase(dbPath)
 	}
 
-	dbPath := filepath.Join(home, "Dropbox", "project-management", "dppm.db")
-
-	// Create data directory if it doesn't exist
-	dataDir := filepath.Dir(dbPath)
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
-		return fmt.Errorf("failed to create data directory: %v", err)
+	// We're in a bound project - use project-specific database
+	projectDataDir := filepath.Join(context.DropboxPath, "data")
+	if err := os.MkdirAll(projectDataDir, 0755); err != nil {
+		return fmt.Errorf("failed to create project data directory: %v", err)
 	}
 
+	dbPath := filepath.Join(projectDataDir, "dppm.db")
+	return openDatabase(dbPath)
+}
+
+// openDatabase opens the SQLite database at the given path
+func openDatabase(dbPath string) error {
+	var err error
 	db, err = sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return fmt.Errorf("failed to open database: %v", err)
@@ -111,7 +127,59 @@ func createERDSchema() error {
 		CHECK (task_id != depends_on)
 	);
 
-	-- AI Guidance Views
+	-- AI Guidance Views (will be created later via separate functions)
+	`
+
+	_, err := db.Exec(schema)
+	if err != nil {
+		return fmt.Errorf("failed to create schema: %v", err)
+	}
+
+	if err := createERDTriggers(); err != nil {
+		return err
+	}
+
+	return createERDViews()
+}
+
+// createERDTriggers creates status transition and dependency enforcement triggers
+func createERDTriggers() error {
+	// Create each trigger separately to avoid syntax issues
+	triggers := []string{
+		`CREATE TRIGGER IF NOT EXISTS enforce_status_transitions
+		BEFORE UPDATE ON tasks
+		FOR EACH ROW
+		WHEN NEW.status != OLD.status
+		BEGIN
+			SELECT CASE
+				WHEN OLD.status = 'done' AND NEW.status != 'done' THEN
+					RAISE(ABORT, 'Cannot change status from done')
+				WHEN OLD.status = 'pending' AND NEW.status = 'done' THEN
+					RAISE(ABORT, 'Cannot skip in_progress status')
+			END;
+		END;`,
+
+		`CREATE TRIGGER IF NOT EXISTS update_task_timestamp
+		AFTER UPDATE ON tasks
+		FOR EACH ROW
+		BEGIN
+			UPDATE tasks SET updated = CURRENT_TIMESTAMP WHERE id = NEW.id;
+		END;`,
+	}
+
+	for _, trigger := range triggers {
+		if _, err := db.Exec(trigger); err != nil {
+			return fmt.Errorf("failed to create trigger: %v", err)
+		}
+	}
+
+	return nil
+}
+
+// createERDViews creates AI guidance views with proper SQLite syntax
+func createERDViews() error {
+	views := `
+	-- AI Ready Tasks View
 	CREATE VIEW IF NOT EXISTS ai_ready_tasks AS
 	SELECT
 		t.id,
@@ -125,11 +193,11 @@ func createERDSchema() error {
 		WHERE td.task_id = t.id AND dep.status != 'done'
 	);
 
-	-- Next available task IDs
+	-- Next Available Task IDs View
 	CREATE VIEW IF NOT EXISTS next_available_tasks AS
 	SELECT
 		p.id as phase_id,
-		'T' || SUBSTR(p.id, 2) || '.' || COALESCE(MAX(task_num), 0) + 1 as next_task_id
+		'T' || SUBSTR(p.id, 2) || '.' || (COALESCE(MAX(task_num), 0) + 1) as next_task_id
 	FROM phases p
 	LEFT JOIN (
 		SELECT
@@ -141,7 +209,7 @@ func createERDSchema() error {
 	WHERE p.id != 'BUGS'
 	GROUP BY p.id;
 
-	-- AI Guidance dashboard
+	-- AI Guidance Dashboard View
 	CREATE VIEW IF NOT EXISTS ai_guidance AS
 	SELECT
 		'READY' as type,
@@ -167,62 +235,7 @@ func createERDSchema() error {
 	GROUP BY t.id, t.title;
 	`
 
-	_, err := db.Exec(schema)
-	if err != nil {
-		return fmt.Errorf("failed to create schema: %v", err)
-	}
-
-	return createERDTriggers()
-}
-
-// createERDTriggers creates status transition and dependency enforcement triggers
-func createERDTriggers() error {
-	triggers := `
-	-- Status transition enforcement
-	CREATE TRIGGER IF NOT EXISTS enforce_status_transitions
-	BEFORE UPDATE ON tasks
-	FOR EACH ROW
-	WHEN NEW.status != OLD.status
-	BEGIN
-		-- Cannot go back from done
-		SELECT CASE
-			WHEN OLD.status = 'done' AND NEW.status != 'done' THEN
-				RAISE(ABORT, '❌ Cannot change status from done. Task is completed.')
-		END;
-
-		-- Cannot skip in_progress
-		SELECT CASE
-			WHEN OLD.status = 'pending' AND NEW.status = 'done' THEN
-				RAISE(ABORT, '❌ Cannot skip in_progress. Use --status in_progress first')
-		END;
-	END;
-
-	-- Dependency enforcement
-	CREATE TRIGGER IF NOT EXISTS enforce_dependencies
-	BEFORE UPDATE ON tasks
-	FOR EACH ROW
-	WHEN NEW.status = 'in_progress' AND OLD.status = 'pending'
-	BEGIN
-		SELECT CASE
-			WHEN EXISTS (
-				SELECT 1 FROM task_dependencies td
-				JOIN tasks dep ON dep.id = td.depends_on
-				WHERE td.task_id = NEW.id AND dep.status != 'done'
-			) THEN
-				RAISE(ABORT, '❌ Cannot start task. Dependencies not completed. Use: dppm status dependencies ' || NEW.id)
-		END;
-	END;
-
-	-- Update timestamp trigger
-	CREATE TRIGGER IF NOT EXISTS update_task_timestamp
-	AFTER UPDATE ON tasks
-	FOR EACH ROW
-	BEGIN
-		UPDATE tasks SET updated = CURRENT_TIMESTAMP WHERE id = NEW.id;
-	END;
-	`
-
-	_, err := db.Exec(triggers)
+	_, err := db.Exec(views)
 	return err
 }
 
@@ -324,10 +337,17 @@ func getAIGuidance() ([]map[string]string, error) {
 
 	var guidance []map[string]string
 	for rows.Next() {
-		var g map[string]string = make(map[string]string)
-		err := rows.Scan(&g["type"], &g["task_id"], &g["title"], &g["message"], &g["command"])
+		var gType, taskID, title, message, command string
+		err := rows.Scan(&gType, &taskID, &title, &message, &command)
 		if err != nil {
 			return nil, err
+		}
+		g := map[string]string{
+			"type":    gType,
+			"task_id": taskID,
+			"title":   title,
+			"message": message,
+			"command": command,
 		}
 		guidance = append(guidance, g)
 	}
