@@ -1687,6 +1687,371 @@ Quick Setup:
   • dppm wiki "ai workflow"                  # AI-optimized DPPM usage`)
 }
 
+func showTaskNumberingGuide() {
+	fmt.Println(`Task Numbering & Sequential Ordering Guide
+=========================================
+
+🎯 PROBLEM: Tasks without clear numbering cause confusion for AI agents
+
+✅ SOLUTION: Use consistent numbering conventions for phases and tasks
+
+📋 PHASE NUMBERING:
+==================
+
+Use P1, P2, P3 format for phases:
+  dppm phase create p1-foundation --name "P1: Foundation & Setup"
+  dppm phase create p2-core --name "P2: Core Implementation"
+  dppm phase create p3-polish --name "P3: Polish & Deployment"
+
+📝 TASK NUMBERING:
+==================
+
+Use Tx.y format within phases (T1.1, T1.2, T1.3):
+
+Phase P1 tasks:
+  dppm task create t1-1-setup --title "T1.1: Project Setup & Dependencies"
+  dppm task create t1-2-config --title "T1.2: Configuration & Environment"
+  dppm task create t1-3-structure --title "T1.3: Directory Structure"
+
+Phase P2 tasks:
+  dppm task create t2-1-database --title "T2.1: Database Schema"
+  dppm task create t2-2-api --title "T2.2: API Endpoints"
+  dppm task create t2-3-auth --title "T2.3: Authentication System"
+
+🔗 CROSS-PHASE DEPENDENCIES:
+============================
+
+Tasks can depend on previous phases:
+  # T2.1 depends on T1.3 completing
+  dppm task create t2-1-database --dependency-ids "t1-3-structure"
+
+  # T3.1 depends on multiple T2 tasks
+  dppm task create t3-1-deployment --dependency-ids "t2-1-database,t2-2-api,t2-3-auth"
+
+✅ BENEFITS FOR AI AGENTS:
+==========================
+
+• Clear sequential order: T1.1 → T1.2 → T1.3 → T2.1 → T2.2...
+• Easy "next task" identification: If T1.2 is done, work on T1.3
+• Phase progression visibility: Complete P1 before starting P2
+• Dependency chain clarity: T2.x tasks depend on T1.x completion
+
+📋 REAL EXAMPLE:
+===============
+
+Web app project structure:
+  P1: Foundation (T1.1-T1.4)
+  P2: Backend (T2.1-T2.5)
+  P3: Frontend (T3.1-T3.4)
+  P4: Deployment (T4.1-T4.2)
+
+Commands:
+  dppm phase create p1-foundation --name "P1: Foundation"
+  dppm task create t1-1-setup --title "T1.1: Initial Setup"
+  dppm task create t1-2-deps --title "T1.2: Dependencies" --dependency-ids "t1-1-setup"
+  dppm task create t2-1-server --title "T2.1: Server Setup" --dependency-ids "t1-2-deps"
+
+🔍 Related Commands:
+  • dppm wiki "dependencies"      # Dependency management
+  • dppm wiki "iterative"         # Iterative building practices
+  • dppm status dependencies      # View dependency chains`)
+}
+
+func showIterativeTaskGuide() {
+	fmt.Println(`Iterative AI Task Building Guide
+================================
+
+🎯 PROBLEM: AI agents think project building is "one-shot"
+❌ WRONG: "I'll build everything perfectly in one pass"
+✅ CORRECT: "I'll build iteratively with clear handoffs"
+
+🔄 THE ITERATIVE REALITY:
+========================
+
+Every project involves:
+1. **Discovery** - Finding what exists
+2. **Assessment** - Understanding current state
+3. **Planning** - Deciding what to change
+4. **Implementation** - Making targeted changes
+5. **Verification** - Checking results
+6. **Handoff** - Preparing for next task
+
+⚠️ ANTI-SCOPE CREEP RULES:
+===========================
+
+Each task must define:
+• ✅ WHAT IS BUILT (current state)
+• ✅ WHAT TO BUILD (this task only)
+• ❌ WHAT NOT TO BUILD (other tasks)
+• 🔄 WHAT TO REFACTOR (if needed)
+
+📋 TASK AUTONOMY REQUIREMENTS:
+==============================
+
+Each task description must include:
+
+```yaml
+description: |
+  ## Tx.y: Task Title - COMPLETE CONTEXT
+
+  **🏗️ EXISTING CODEBASE STATE:**
+  [200 lines: What files exist, what's implemented, what works]
+
+  **🎯 THIS TASK SCOPE:**
+  [150 lines: Exactly what to build, modify, or refactor]
+
+  **🚫 FORBIDDEN ACTIONS:**
+  [100 lines: What NOT to touch, other tasks' responsibilities]
+
+  **📋 VERIFICATION CHECKLIST:**
+  [50 lines: How to verify task completion]
+
+  **🔄 NEXT TASK HANDOFF:**
+  [100 lines: What the next task will need to know]
+```
+
+🤖 AI-SPECIFIC GUIDANCE:
+========================
+
+DO:
+✅ Read ALL existing files before changing anything
+✅ Understand project architecture before coding
+✅ Make minimal changes to achieve task goals
+✅ Document what you built for next AI instance
+✅ Test changes before marking task complete
+
+DON'T:
+❌ Assume you know the full project scope
+❌ Refactor code outside your task boundary
+❌ Add features not specified in task description
+❌ Skip verification steps
+❌ Leave incomplete implementations
+
+📂 TASK SUMMARY WORKFLOW:
+=========================
+
+Each completed task should create:
+```bash
+# Task completion summary
+echo "## T1.2 COMPLETED: Configuration Setup" > task-handoff.md
+echo "### Built:" >> task-handoff.md
+echo "- config/app.yaml with database settings" >> task-handoff.md
+echo "- config/env.yaml with environment variables" >> task-handoff.md
+echo "### Next Task Needs:" >> task-handoff.md
+echo "- Use config/app.yaml for database connection" >> task-handoff.md
+echo "- Environment loaded from config/env.yaml" >> task-handoff.md
+```
+
+🔍 ITERATIVE COMMANDS:
+======================
+
+Before starting any task:
+  dppm status project PROJECT_NAME    # See what exists
+  dppm list tasks                     # See all tasks
+  dppm wiki "project structure"       # Understand layout
+
+During task work:
+  dppm task update TASK_ID --status in_progress
+  dppm task update TASK_ID --description "Updated progress notes"
+
+After completing task:
+  dppm task update TASK_ID --status done
+  dppm task create NEXT_TASK --title "..." # Prepare next task
+
+🔍 Related Commands:
+  • dppm wiki "verbose task"          # Detailed task descriptions
+  • dppm wiki "task numbering"        # Sequential ordering
+  • dppm status dependencies          # Task relationships`)
+}
+
+func showVerboseTaskGuide() {
+	fmt.Println(`Verbose AI Task Description Guide
+=================================
+
+🎯 PROBLEM: Short task descriptions (10-50 lines) cause scope creep
+✅ SOLUTION: Verbose task descriptions (100-400 lines) with full context
+
+📏 REQUIRED TASK LENGTH:
+========================
+• Minimum: 100 lines of description
+• Optimal: 200-400 lines
+• Include: Complete context, boundaries, verification
+
+🧠 WHY VERBOSE TASKS WORK:
+==========================
+
+**Context Switching Cost:** AI agents can't remember entire project
+**Mental Overhead:** "What are we building? Why? How?"
+**Decision Paralysis:** "Is this in scope? Should I ask?"
+**Wrong Assumptions:** Guessing leads to massive scope creep
+
+📝 TASK DESCRIPTION TEMPLATE:
+=============================
+
+YAML Task Format:
+description: |
+  ## Tx.y: Component Name - SCOPE SUMMARY
+
+  **🎯 PROJECT OVERVIEW (REPEATED IN EVERY TASK):**
+  [150 lines explaining what we're building, why, architecture]
+
+  Complete project context:
+  - What: [Web application, CLI tool, API service, etc.]
+  - Why: [Business goals, user needs, problem solving]
+  - How: [Architecture, tech stack, deployment strategy]
+  - Who: [Target users, stakeholders, team structure]
+
+  **📋 TECH STACK (REPEATED):**
+  [100 lines: languages, frameworks, performance targets]
+
+  Technology decisions:
+  - Backend: [Language, framework, database, hosting]
+  - Frontend: [Framework, styling, build tools, CDN]
+  - DevOps: [CI/CD, monitoring, logging, backups]
+  - Performance: [Speed targets, scaling requirements]
+
+  **📂 PREVIOUS TASKS HANDOFF:**
+  [100 lines: what previous tasks built, file locations, what's protected]
+
+  Current codebase state:
+  - Files created: [List all files with purposes]
+  - Features implemented: [Working functionality]
+  - Protected code: [Don't modify these areas]
+  - Known issues: [Temporary hacks, TODO items]
+
+  **✏️ THIS TASK IMPLEMENTATION:**
+  [100 lines: exact steps, file operations, verification]
+
+  Specific implementation plan:
+  - Files to create: [Exact filenames and locations]
+  - Files to modify: [Specific changes needed]
+  - Functions to implement: [Method signatures, logic]
+  - Tests to write: [Test cases, edge conditions]
+
+  **🚫 FORBIDDEN (ANTI-SCOPE CREEP):**
+  [50 lines: what NOT to add, other tasks' responsibilities]
+
+  Scope boundaries:
+  - Don't add: [Features for future tasks]
+  - Don't modify: [Other components' code]
+  - Don't optimize: [Performance not in scope]
+  - Don't style: [UI/UX for other tasks]
+
+  **✅ SUCCESS CRITERIA:**
+  [50 lines: clear completion definitions, testing steps]
+
+  Task completion checklist:
+  - [ ] All specified files created
+  - [ ] All tests passing
+  - [ ] No errors in console/logs
+  - [ ] Feature works as specified
+  - [ ] Next task handoff documented
+
+🎯 REAL EXAMPLE (WEB APP):
+==========================
+
+**BAD (10 lines):**
+```yaml
+description: |
+  ## T2.3: User Authentication
+  Create login system with JWT tokens
+  - Login form
+  - JWT generation
+  - Protected routes
+```
+
+**GOOD (300+ lines):**
+```yaml
+description: |
+  ## T2.3: User Authentication - JWT LOGIN SYSTEM ONLY
+
+  **🎯 PROJECT OVERVIEW (FULL CONTEXT):**
+  We're building SaaS Dashboard - B2B project management web app
+  Target: 100-person teams tracking 50+ projects simultaneously
+  Tech stack: Node.js backend + React frontend + PostgreSQL
+  Deployment: Docker containers on AWS ECS + RDS database
+  Performance: <200ms API response, supports 1000 concurrent users
+
+  **📋 TECH STACK (COMPLETE PICTURE):**
+  Backend: Express.js 4.18, bcrypt password hashing, jsonwebtoken 9.0
+  Database: PostgreSQL 14 with connection pooling (pg-pool)
+  Frontend: React 18 + TypeScript, React Router v6, Axios HTTP client
+  Authentication: JWT tokens (24h expiry), refresh tokens (30d expiry)
+  Validation: Joi schema validation, helmet security headers
+
+  **📂 PREVIOUS TASKS HANDOFF:**
+  T2.1 built: Database schema (users table with email, password_hash, created_at)
+  T2.2 built: Express server with CORS, body parsing, error handling
+  Files in place:
+  - server/models/User.js (database model, PROTECTED - don't modify)
+  - server/app.js (Express setup, PROTECTED - don't modify)
+  - server/routes/api.js (empty routes file, ADD auth routes here)
+  - client/src/App.js (basic React app, ADD auth components)
+
+  Working features:
+  - Database connection established
+  - User registration endpoint (/api/register)
+  - Password hashing with bcrypt
+  - Basic error handling middleware
+
+  **✏️ THIS TASK IMPLEMENTATION:**
+  Implement JWT authentication system:
+
+  Server changes (server/routes/auth.js - NEW FILE):
+  - POST /api/login endpoint
+  - Email/password validation
+  - bcrypt.compare() for password check
+  - JWT token generation (24h expiry)
+  - Refresh token generation (30d expiry)
+  - Error handling for invalid credentials
+
+  Client changes (client/src/components/Login.js - NEW FILE):
+  - Login form with email/password fields
+  - Form validation (email format, required fields)
+  - Axios POST to /api/login
+  - Token storage in localStorage
+  - Redirect to dashboard on success
+  - Error display for failed login
+
+  **🚫 FORBIDDEN (ANTI-SCOPE CREEP):**
+  Don't add: User registration UI (T2.4's job)
+  Don't modify: Database schema (T2.1 owns this)
+  Don't implement: Password reset (T3.2's responsibility)
+  Don't style: Login form CSS (T4.1 handles all styling)
+  Don't optimize: Token refresh logic (T3.1's enhancement)
+
+  **✅ SUCCESS CRITERIA:**
+  - [ ] /api/login endpoint responds 200 with valid JWT
+  - [ ] Login form submits and stores token
+  - [ ] Invalid credentials return 401 error
+  - [ ] JWT payload contains user ID and expiry
+  - [ ] All tests pass: npm test
+  - [ ] No console errors in browser/server
+```
+
+✅ BENEFITS OBSERVED:
+=====================
+
+**With Verbose Tasks (400 lines):**
+✅ AI instances start with complete understanding
+✅ Zero scope creep - boundaries crystal clear
+✅ No "what should I build?" confusion
+✅ Consistent implementation across developers
+✅ Perfect handoff between AI instances
+
+**With Short Tasks (50 lines):**
+❌ AI instances guess project intent
+❌ Massive scope creep and feature bloat
+❌ Inconsistent implementations
+❌ Broken handoffs between tasks
+❌ "What are we building again?" confusion
+
+🔍 Related Commands:
+  • dppm wiki "iterative"             # Iterative building practices
+  • dppm wiki "task numbering"        # Sequential task ordering
+  • dppm task create --help           # Task creation options`)
+}
+
 func init() {
 	rootCmd.AddCommand(wikiCmd)
 }
