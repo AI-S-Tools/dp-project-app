@@ -153,6 +153,12 @@ Examples:
 		priority, _ := cmd.Flags().GetString("priority")
 		assignee, _ := cmd.Flags().GetString("assignee")
 
+		// Validate that project ID is available (either from flag or local binding)
+		if projectID == "" {
+			fmt.Fprintf(os.Stderr, "Error: project is required. Either use --project flag or run 'dppm bind PROJECT_ID' to set local project context.\n")
+			return
+		}
+
 		if title == "" {
 			title = taskID
 		}
@@ -554,7 +560,8 @@ func init() {
 	createTaskCmd.Flags().String("priority", "medium", "Task priority (low, medium, high, critical)")
 	createTaskCmd.Flags().StringP("assignee", "a", "", "Task assignee")
 
-	createTaskCmd.MarkFlagRequired("project")
+	// Project flag will be handled manually in Run function to allow auto-scoping from local binding
+	// createTaskCmd.MarkFlagRequired("project")
 
 	// Show command flags
 	showTaskCmd.Flags().StringP("project", "p", "", "Project ID (if not specified, searches all projects)")

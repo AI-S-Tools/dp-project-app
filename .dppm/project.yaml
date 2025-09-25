@@ -1,44 +1,4 @@
-id: dppm
-name: DPPM - Dropbox Project Manager
-description: |
-  AI-first CLI tool for managing projects, phases, and tasks using Dropbox as the storage backend.
-  Comprehensive project management with YAML-based storage and verbose AI-friendly output.
-status: active
-owner: AI-S-Tools
-repository: https://github.com/AI-S-Tools/dppm
-created: "2025-09-24"
-updated: "2025-09-25"
-team_members:
-  - AI-S-Tools
-tags:
-  - cli
-  - project-management
-  - dropbox
-  - yaml
-  - golang
-  - ai-tools
-metadata:
-  language: Go
-  version: v1.1.0
-  license: MIT
-  dropbox_path: ~/Dropbox/project-management/projects/dppm
-  issues_tracker: https://github.com/AI-S-Tools/dppm/issues
-  ci_status: failing
-  test_coverage: 13%
-  priority: critical
-notes: |
-  ⚠️ CRITICAL: 12 bugs blocking v1.1.1 release (GitHub issues #20-31)
-  - Only 13% of tests passing
-  - Core commands broken: init, bind, list active, status active, list phases
-  - Must fix all issues before any new development
-current_phase: bug-fixing
-milestones:
-  - id: v1.1.1
-    status: blocked
-    blockers:
-      - "Issue #20: dppm init binary path bug"
-      - "Issue #26: dppm bind command missing"
-      - "Issue #27: list/status active commands missing"
-      - "Issue #24: list phases command missing"
-      - "Issue #28: collab clean not working"
-      - "Issue #22,#25: task dependency flags missing"
+project_id: dppm
+project_name: DPPM - Dropbox Project Manager
+dropbox_path: /home/ubuntu/Dropbox/project-management/projects/dppm
+created: "2025-09-25T17:35:09Z"

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -78,6 +79,7 @@ func init() {
 	rootCmd.AddCommand(statusCmd)
 	rootCmd.AddCommand(wikiCmd)
 	rootCmd.AddCommand(collabCmd)
+	rootCmd.AddCommand(bindCmd)
 
 	// Add --wiki flag for direct search
 	rootCmd.Flags().String("wiki", "", "Search DPPM knowledge base (e.g. --wiki \"create task\")")
@@ -211,4 +213,92 @@ func setDefaultProjectFlag(cmd *cobra.Command, flagName string) {
 
 	// Set the project flag to the local context value
 	cmd.Flags().Set(flagName, context.ProjectID)
+}
+
+var bindCmd = &cobra.Command{
+	Use:   "bind [project-id]",
+	Short: "Bind local directory to a DPPM project",
+	Long: `Bind Local Directory to DPPM Project
+
+Creates a local project binding that allows you to use DPPM commands
+without specifying the --project flag. The binding creates a .dppm/project.yaml
+file in the current directory.
+
+Arguments:
+  project-id    ID of the existing project to bind to
+
+Examples:
+  dppm bind my-project           # Bind current directory to 'my-project'
+  dppm task create new-task      # Now works without --project flag
+  dppm phase create phase-1      # All commands use bound project
+
+After binding, you can use any project-scoped command without the --project flag:
+  dppm task create task-id --title "New Task"
+  dppm phase create phase-id --name "New Phase"
+  dppm status blocked
+
+To unbind, simply remove the .dppm directory: rm -rf .dppm`,
+	Args: cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		projectID := args[0]
+
+		// Check if project exists
+		projectPath := filepath.Join(projectsPath, "projects", projectID)
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "Error: Project '%s' does not exist.\n", projectID)
+			fmt.Fprintf(os.Stderr, "Use 'dppm list projects' to see available projects.\n")
+			return
+		}
+
+		// Create .dppm directory
+		if err := os.MkdirAll(".dppm", 0755); err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating .dppm directory: %v\n", err)
+			return
+		}
+
+		// Read project metadata from Dropbox if available
+		projectFile := filepath.Join(projectPath, "project.yaml")
+		var projectName string
+		if data, err := os.ReadFile(projectFile); err == nil {
+			var project map[string]interface{}
+			if err := yaml.Unmarshal(data, &project); err == nil {
+				if name, ok := project["name"].(string); ok {
+					projectName = name
+				}
+			}
+		}
+
+		// Create binding
+		binding := LocalProjectBinding{
+			ProjectID:   projectID,
+			ProjectName: projectName,
+			DropboxPath: projectPath,
+			Created:     time.Now().Format(time.RFC3339),
+		}
+
+		data, err := yaml.Marshal(binding)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating binding configuration: %v\n", err)
+			return
+		}
+
+		// Write binding file
+		if err := os.WriteFile(".dppm/project.yaml", data, 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "Error writing binding file: %v\n", err)
+			return
+		}
+
+		fmt.Printf("✅ Successfully bound current directory to project '%s'\n", projectID)
+		if projectName != "" {
+			fmt.Printf("📁 Project Name: %s\n", projectName)
+		}
+		fmt.Printf("🔗 Dropbox Path: %s\n", projectPath)
+		fmt.Println()
+		fmt.Println("🎯 You can now use project-scoped commands without --project flag:")
+		fmt.Println("   dppm task create new-task --title \"My Task\"")
+		fmt.Println("   dppm phase create phase-1 --name \"New Phase\"")
+		fmt.Println("   dppm status blocked")
+		fmt.Println()
+		fmt.Println("💡 To unbind: rm -rf .dppm")
+	},
 }

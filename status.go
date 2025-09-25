@@ -105,6 +105,9 @@ var statusBlockedCmd = &cobra.Command{
 Display all tasks that are currently blocked by dependencies.
 Shows which tasks are blocking each blocked task.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Set default project from local context if not explicitly provided
+		setDefaultProjectFlag(cmd, "project")
+
 		projectID, _ := cmd.Flags().GetString("project")
 
 		if projectID != "" {
@@ -123,6 +126,9 @@ var statusDependenciesCmd = &cobra.Command{
 Display comprehensive view of all task dependencies across projects.
 Shows the dependency graph and highlights potential issues.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Set default project from local context if not explicitly provided
+		setDefaultProjectFlag(cmd, "project")
+
 		projectID, _ := cmd.Flags().GetString("project")
 
 		if projectID != "" {
