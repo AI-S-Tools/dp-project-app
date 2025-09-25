@@ -176,6 +176,8 @@ func searchWiki(searchTerm string) {
 		showIterativeTaskGuide()
 	case strings.Contains(searchLower, "verbose task") || strings.Contains(searchLower, "ai task") || strings.Contains(searchLower, "long description"):
 		showVerboseTaskGuide()
+	case strings.Contains(searchLower, "projekt-træ") || strings.Contains(searchLower, "project tree") || strings.Contains(searchLower, "restrictive"):
+		showRestrictiveProjectGuide()
 	default:
 		fmt.Printf("No specific guide found for '%s'\n\n", searchTerm)
 		fmt.Println("Try one of these common searches:")
@@ -1790,7 +1792,7 @@ Each task must define:
 
 Each task description must include:
 
-```yaml
+YAML Task Format:
 description: |
   ## Tx.y: Task Title - COMPLETE CONTEXT
 
@@ -1808,7 +1810,6 @@ description: |
 
   **🔄 NEXT TASK HANDOFF:**
   [100 lines: What the next task will need to know]
-```
 
 🤖 AI-SPECIFIC GUIDANCE:
 ========================
@@ -1831,7 +1832,8 @@ DON'T:
 =========================
 
 Each completed task should create:
-```bash
+
+Bash Example:
 # Task completion summary
 echo "## T1.2 COMPLETED: Configuration Setup" > task-handoff.md
 echo "### Built:" >> task-handoff.md
@@ -1840,7 +1842,6 @@ echo "- config/env.yaml with environment variables" >> task-handoff.md
 echo "### Next Task Needs:" >> task-handoff.md
 echo "- Use config/app.yaml for database connection" >> task-handoff.md
 echo "- Environment loaded from config/env.yaml" >> task-handoff.md
-```
 
 🔍 ITERATIVE COMMANDS:
 ======================
@@ -1951,17 +1952,16 @@ description: |
 ==========================
 
 **BAD (10 lines):**
-```yaml
+YAML Example:
 description: |
   ## T2.3: User Authentication
   Create login system with JWT tokens
   - Login form
   - JWT generation
   - Protected routes
-```
 
 **GOOD (300+ lines):**
-```yaml
+YAML Example:
 description: |
   ## T2.3: User Authentication - JWT LOGIN SYSTEM ONLY
 
@@ -2027,7 +2027,6 @@ description: |
   - [ ] JWT payload contains user ID and expiry
   - [ ] All tests pass: npm test
   - [ ] No console errors in browser/server
-```
 
 ✅ BENEFITS OBSERVED:
 =====================
@@ -2050,6 +2049,121 @@ description: |
   • dppm wiki "iterative"             # Iterative building practices
   • dppm wiki "task numbering"        # Sequential task ordering
   • dppm task create --help           # Task creation options`)
+}
+
+func showRestrictiveProjectGuide() {
+	fmt.Println(`Restrictive Project Tree Management
+=================================
+
+🎯 DPPM RESTRICTIVE MODE: Enforced project structure for consistency
+
+📂 HIERARCHICAL STRUCTURE:
+=========================
+
+Project
+├── Phase P1 (numbered, unique)
+│   ├── Task T1.1 (file: task.yaml)
+│   ├── Task T1.2 (folder: contains subtasks)
+│   │   ├── T1.2.1-subtask.yaml
+│   │   └── T1.2.2-subtask.yaml
+│   └── Task T1.3 (file: task.yaml)
+├── Phase P2 (numbered, unique)
+│   ├── Task T2.1
+│   └── Task T2.2
+└── Phase BUGS (special phase)
+    ├── bug-auth-login.yaml
+    ├── bug-db-connection.yaml
+    └── bug-ui-styling.yaml
+
+🔢 NUMBERING RULES:
+==================
+
+**Phases:** P1, P2, P3, P4... + BUGS (special)
+  ✅ Valid: P1-foundation, P2-backend, P3-frontend, BUGS
+  ❌ Invalid: phase1, setup-phase, P1-P2-combined
+
+**Tasks:** T{phase}.{sequence} format within phases
+  ✅ Valid: T1.1, T1.2, T2.1, T2.2, T3.1
+  ❌ Invalid: task1, T1-1, T2.A, random-task-name
+
+**Bug Tasks:** bug-{description}.yaml in BUGS phase
+  ✅ Valid: bug-login-failure.yaml, bug-db-timeout.yaml
+  ❌ Invalid: login-bug.yaml, issue-auth.yaml
+
+📋 TASK STRUCTURE RULES:
+=======================
+
+**File Task (Simple):** Single YAML file
+  ~/Dropbox/project-management/projects/PROJECT/phases/P1/tasks/T1.1.yaml
+
+**Folder Task (Complex):** Directory with subtasks
+  ~/Dropbox/project-management/projects/PROJECT/phases/P1/tasks/T1.2/
+  ├── task.yaml          # Main task definition
+  ├── T1.2.1-setup.yaml  # Subtask 1
+  └── T1.2.2-config.yaml # Subtask 2
+
+🔒 YAML VALIDATION REQUIREMENTS:
+===============================
+
+All task YAML files MUST contain these fields (no empty values):
+
+Required Fields:
+  id: "task-id"                    # MANDATORY
+  title: "Task Title"              # MANDATORY
+  status: "pending|in_progress|done" # MANDATORY
+  created: "2024-01-01T00:00:00Z"  # MANDATORY
+  project-description: |           # NEW: Project context
+    [What is this project? Why does it exist?]
+  task-description: |              # NEW: Task-specific work
+    [What does THIS task accomplish?]
+  expected-product-description: |  # NEW: Deliverable description
+    [What will be created/modified by this task?]
+
+Optional Fields (can be empty):
+  description: ""                  # Legacy field (deprecated)
+  dependencies: []                 # Task IDs this depends on
+  assigned_to: ""                  # Team member
+  due_date: ""                     # Deadline
+  priority: "medium"               # low/medium/high
+
+⚠️ VALIDATION ENFORCEMENT:
+=========================
+
+DPPM will REJECT tasks that:
+❌ Have empty MANDATORY fields
+❌ Use invalid naming patterns
+❌ Create duplicate phase numbers
+❌ Place tasks in wrong phase structure
+❌ Skip required YAML keys
+
+✅ DPPM will ACCEPT tasks that:
+✅ Follow P{number} phase naming
+✅ Use T{phase}.{task} task naming
+✅ Fill all mandatory YAML fields
+✅ Use proper bug naming (bug-*.yaml in BUGS)
+
+🚀 COMMANDS FOR RESTRICTIVE MODE:
+================================
+
+Create structured project:
+  dppm project create my-app --restrictive
+
+Create numbered phases (enforced sequence):
+  dppm phase create P1 --name "Foundation" --project my-app
+  dppm phase create P2 --name "Implementation" --project my-app
+  dppm phase create BUGS --name "Bug Tracking" --project my-app
+
+Create properly numbered tasks:
+  dppm task create T1.1 --title "Project Setup" --phase P1 --project my-app
+  dppm task create T1.2 --title "Dependencies" --phase P1 --project my-app
+
+Create bug tasks:
+  dppm task create bug-login-error --title "Login fails with 500" --phase BUGS --project my-app
+
+🔍 Related Commands:
+  • dppm wiki "task numbering"    # Numbering conventions
+  • dppm wiki "verbose task"      # Task description best practices
+  • dppm project validate         # Check project structure`)
 }
 
 func init() {
