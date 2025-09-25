@@ -1,4 +1,4 @@
-module dp-project-app
+module dppm
 
 go 1.22.5
 

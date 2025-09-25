@@ -1,23 +1,23 @@
 # Homebrew Formula for DPPM (Dropbox Project Manager)
 class Dppm < Formula
   desc "AI-first CLI tool for project, phase, and task management using Dropbox"
-  homepage "https://github.com/AI-S-Tools/dp-project-app"
+  homepage "https://github.com/AI-S-Tools/dppm"
   version "1.0.0"
 
   if OS.mac?
     if Hardware::CPU.arm?
-      url "https://github.com/AI-S-Tools/dp-project-app/releases/download/v1.0.0/dppm-macos-arm64"
+      url "https://github.com/AI-S-Tools/dppm/releases/download/v1.0.0/dppm-macos-arm64"
       sha256 "TBD" # This will need to be updated with actual SHA256
     else
-      url "https://github.com/AI-S-Tools/dp-project-app/releases/download/v1.0.0/dppm-macos-amd64"
+      url "https://github.com/AI-S-Tools/dppm/releases/download/v1.0.0/dppm-macos-amd64"
       sha256 "TBD" # This will need to be updated with actual SHA256
     end
   elsif OS.linux?
     if Hardware::CPU.arm?
-      url "https://github.com/AI-S-Tools/dp-project-app/releases/download/v1.0.0/dppm-linux-arm64"
+      url "https://github.com/AI-S-Tools/dppm/releases/download/v1.0.0/dppm-linux-arm64"
       sha256 "TBD" # This will need to be updated with actual SHA256
     else
-      url "https://github.com/AI-S-Tools/dp-project-app/releases/download/v1.0.0/dppm-linux-amd64"
+      url "https://github.com/AI-S-Tools/dppm/releases/download/v1.0.0/dppm-linux-amd64"
       sha256 "TBD" # This will need to be updated with actual SHA256
     end
   end
@@ -49,7 +49,7 @@ class Dppm < Formula
       Storage Location: ~/Dropbox/project-management/
 
       Learn More:
-        Repository: https://github.com/AI-S-Tools/dp-project-app
+        Repository: https://github.com/AI-S-Tools/dppm
         Use the built-in wiki system for complete documentation
     EOS
   end

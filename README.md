@@ -17,7 +17,7 @@ A comprehensive CLI tool for managing projects, sprints, and tasks using Dropbox
 
 ```bash
 # Add the tap (once)
-brew tap AI-S-Tools/dp-project-app https://github.com/AI-S-Tools/dp-project-app
+brew tap AI-S-Tools/dppm https://github.com/AI-S-Tools/dppm
 
 # Install DPPM
 brew install dppm
@@ -30,7 +30,7 @@ dppm wiki "getting started"
 ### Option 2: One-Line Install (All Platforms)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AI-S-Tools/dp-project-app/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AI-S-Tools/dppm/master/install.sh | bash
 ```
 
 This script automatically:
@@ -41,14 +41,14 @@ This script automatically:
 
 ### Option 3: Manual Download
 
-Download the latest binary for your platform from [Releases](https://github.com/AI-S-Tools/dp-project-app/releases):
+Download the latest binary for your platform from [Releases](https://github.com/AI-S-Tools/dppm/releases):
 
 #### Linux
 ```bash
 # Download binary (choose your architecture: amd64 or arm64)
-wget https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-amd64
+wget https://github.com/AI-S-Tools/dppm/releases/latest/download/dppm-linux-amd64
 # OR for ARM:
-# wget https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-arm64
+# wget https://github.com/AI-S-Tools/dppm/releases/latest/download/dppm-linux-arm64
 
 # Make executable and install
 chmod +x dppm-linux-amd64
@@ -62,9 +62,9 @@ dppm wiki "getting started"
 #### macOS
 ```bash
 # For Intel Macs:
-curl -L -o dppm https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-macos-amd64
+curl -L -o dppm https://github.com/AI-S-Tools/dppm/releases/latest/download/dppm-macos-amd64
 # For Apple Silicon (M1/M2/M3):
-# curl -L -o dppm https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-macos-arm64
+# curl -L -o dppm https://github.com/AI-S-Tools/dppm/releases/latest/download/dppm-macos-arm64
 
 # Make executable and install
 chmod +x dppm
@@ -76,7 +76,7 @@ dppm wiki "getting started"
 ```
 
 #### Windows
-1. Download `dppm-windows-amd64.exe` from [Releases](https://github.com/AI-S-Tools/dp-project-app/releases)
+1. Download `dppm-windows-amd64.exe` from [Releases](https://github.com/AI-S-Tools/dppm/releases)
 2. Move to a directory in your PATH
 3. Run: `dppm wiki "getting started"`
 
@@ -88,8 +88,8 @@ dppm wiki "getting started"
 ### Option 3: Build from Source
 
 ```bash
-git clone https://github.com/AI-S-Tools/dp-project-app.git
-cd dp-project-app
+git clone https://github.com/AI-S-Tools/dppm.git
+cd dppm
 go build -o dppm
 sudo cp dppm /usr/local/bin/
 ```

@@ -126,7 +126,7 @@ jobs:
           #### Linux / macOS
           ```bash
           # Download binary (replace with your platform)
-          wget https://github.com/AI-S-Tools/dp-project-app/releases/download/${{ steps.version.outputs.VERSION }}/dppm-linux-amd64
+          wget https://github.com/AI-S-Tools/dppm/releases/download/${{ steps.version.outputs.VERSION }}/dppm-linux-amd64
 
           # Make executable and install
           chmod +x dppm-linux-amd64

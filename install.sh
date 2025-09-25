@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # GitHub repository
-REPO="AI-S-Tools/dp-project-app"
+REPO="AI-S-Tools/dppm"
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="dppm"
 
