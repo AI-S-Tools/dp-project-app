@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 var version = "dev" // Will be set during build
@@ -86,6 +87,13 @@ func init() {
 }
 
 func main() {
+	// Initialize ERD database for "hegn på begge sider" validation
+	if err := initDatabase(); err != nil {
+		fmt.Fprintf(os.Stderr, "Database initialization failed: %v\n", err)
+		os.Exit(1)
+	}
+	defer closeDatabase()
+
 	// Check for version flag first
 	for _, arg := range os.Args {
 		if arg == "--version" || arg == "-v" {
@@ -150,4 +158,45 @@ DPPM is designed for AI workflows. The wiki system contains comprehensive
 guides for every feature. Use it to get detailed, actionable information.
 
 Try: dppm wiki "project workflow" to see a complete example!`)
+}
+type LocalProjectBinding struct {
+	ProjectID   string `yaml:"project_id"`
+	ProjectName string `yaml:"project_name,omitempty"`
+	DropboxPath string `yaml:"dropbox_path,omitempty"`
+	Created     string `yaml:"created,omitempty"`
+}
+func getLocalProjectContext() (*LocalProjectBinding, error) {
+	bindingFile := ".dppm/project.yaml"
+	if _, err := os.Stat(bindingFile); os.IsNotExist(err) {
+		return nil, nil // No local binding exists
+	}
+
+	data, err := os.ReadFile(bindingFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read binding file: %v", err)
+	}
+
+	// Try to parse as LocalProjectBinding first
+	var binding LocalProjectBinding
+	if err := yaml.Unmarshal(data, &binding); err != nil {
+		// If that fails, try to extract project ID from regular project metadata
+		var projectData map[string]interface{}
+		if err := yaml.Unmarshal(data, &projectData); err != nil {
+			return nil, fmt.Errorf("failed to parse binding file: %v", err)
+		}
+
+		// Extract project ID from the YAML structure
+		if id, ok := projectData["id"].(string); ok {
+			binding.ProjectID = id
+		}
+		if name, ok := projectData["name"].(string); ok {
+			binding.ProjectName = name
+		}
+	}
+
+	if binding.ProjectID == "" {
+		return nil, fmt.Errorf("no project ID found in binding file")
+	}
+
+	return &binding, nil
 }

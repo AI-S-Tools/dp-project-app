@@ -1,0 +1,15 @@
+	if err := initDatabase(); err != nil {
+		fmt.Fprintf(os.Stderr, "Database initialization failed: %v\n", err)
+		os.Exit(1)
+	}
+	defer closeDatabase()
+
+	// Check for version flag first
+	for _, arg := range os.Args {
+		if arg == "--version" || arg == "-v" {
+			fmt.Printf("DPPM (Dropbox Project Manager) %s\n", version)
+			fmt.Println("AI-first CLI tool for project, phase, and task management")
+			fmt.Println("Repository: https://github.com/AI-S-Tools/dp-project-app")
+			return
+		}
+	}

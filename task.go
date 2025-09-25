@@ -143,6 +143,28 @@ Examples:
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		taskID := args[0]
+
+		// 🚧 VENSTRE HEGN: ERD Validation
+		if err := validateTaskID(taskID); err != nil {
+			fmt.Printf("❌ VENSTRE HEGN: %s\n\n", err.Error())
+
+			// 🎯 HØJRE HEGN: Show correct alternatives
+			fmt.Println("✅ HØJRE HEGN - CORRECT FORMAT:")
+			fmt.Printf("  Task IDs must be T{phase}.{number} or bug-{description}\n")
+			fmt.Printf("  Examples: T1.1, T2.3, bug-login-error\n\n")
+
+			fmt.Println("💡 SUGGESTED COMMANDS:")
+			if suggestions, err := getSuggestedTaskIDs(); err == nil {
+				for _, suggestion := range suggestions {
+					fmt.Printf("  dppm task create %s --title \"Your Task Title\"\n", suggestion)
+				}
+			} else {
+				fmt.Printf("  dppm phase create P1 --name \"Foundation\"  # Create phase first\n")
+				fmt.Printf("  dppm task create T1.1 --title \"Your Task Title\"\n")
+			}
+			return
+		}
+
 		title, _ := cmd.Flags().GetString("title")
 		projectID, _ := cmd.Flags().GetString("project")
 		phaseID, _ := cmd.Flags().GetString("phase")
@@ -211,9 +233,37 @@ Examples:
 			return
 		}
 
-		fmt.Printf("Task '%s' created successfully in project '%s'\n", taskID, projectID)
+		fmt.Printf("✅ Task '%s' created successfully in project '%s'\n", taskID, projectID)
 		if phaseID != "" {
-			fmt.Printf("Assigned to phase: %s\n", phaseID)
+			fmt.Printf("📁 Assigned to phase: %s\n", phaseID)
+		}
+
+		// 🎯 HØJRE HEGN: Show what AI can do next
+		fmt.Printf("\n🎯 HØJRE HEGN - NEXT ACTIONS:\n")
+		fmt.Printf("  dppm task update %s --status in_progress  # Start working on task\n", taskID)
+
+		// Show other ready tasks
+		if guidance, err := getAIGuidance(); err == nil {
+			readyCount := 0
+			for _, guide := range guidance {
+				if guide["type"] == "READY" && guide["task_id"] != taskID {
+					if readyCount == 0 {
+						fmt.Printf("  # Other tasks ready to start:\n")
+					}
+					fmt.Printf("  %s\n", guide["command"])
+					readyCount++
+				}
+			}
+		}
+
+		// Suggest next task creation
+		if suggestions, err := getSuggestedTaskIDs(); err == nil {
+			for _, suggestion := range suggestions {
+				if suggestion != taskID {
+					fmt.Printf("  dppm task create %s --title \"Next Task\"  # Create follow-up task\n", suggestion)
+					break
+				}
+			}
 		}
 	},
 }

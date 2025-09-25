@@ -355,6 +355,36 @@ func getAIGuidance() ([]map[string]string, error) {
 	return guidance, nil
 }
 
+// getSuggestedTaskIDs returns suggested task IDs for all available phases
+func getSuggestedTaskIDs() ([]string, error) {
+	// Query available phases and suggest next task IDs
+	rows, err := db.Query(`
+		SELECT next_task_id
+		FROM next_available_tasks
+		ORDER BY phase_id
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var suggestions []string
+	for rows.Next() {
+		var taskID string
+		if err := rows.Scan(&taskID); err != nil {
+			continue
+		}
+		suggestions = append(suggestions, taskID)
+	}
+
+	// If no phases exist, suggest creating first phase and task
+	if len(suggestions) == 0 {
+		return []string{"T1.1"}, nil
+	}
+
+	return suggestions, nil
+}
+
 // closeDatabase closes the database connection
 func closeDatabase() error {
 	if db != nil {
