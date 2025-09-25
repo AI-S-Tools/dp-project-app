@@ -552,6 +552,137 @@ func updateTaskFile(taskFile string, cmd *cobra.Command) bool {
 	return true
 }
 
+var doneTaskCmd = &cobra.Command{
+	Use:   "done [task-id]",
+	Short: "Mark a task as completed",
+	Long: `Mark Task as Completed
+
+Quickly mark a task as done. This is a shortcut for 'dppm task update TASK_ID --status done'.
+
+Arguments:
+  task-id    Task identifier to mark as done
+
+Examples:
+  dppm task done auth-system        # Mark auth-system task as completed
+  dppm task done bug-fix           # Mark bug-fix task as completed
+
+  # In project-bound directory (after 'dppm bind PROJECT_ID'):
+  dppm task done feature-x         # Auto-scoped to bound project
+
+💡 Alternative: You can also use 'dppm task update TASK_ID --status done' for the same result.`,
+	Args: cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		// Set default project from local context if not explicitly provided
+		setDefaultProjectFlag(cmd, "project")
+
+		taskID := args[0]
+		projectID, _ := cmd.Flags().GetString("project")
+
+		if projectID == "" {
+			// Search and update in all projects
+			searchAndMarkTaskDone(taskID)
+			return
+		}
+
+		// Mark task as done in specific project
+		markTaskDone(projectID, "", taskID)
+	},
+}
+
+func searchAndMarkTaskDone(taskID string) {
+	projectsDir := filepath.Join(projectsPath, "projects")
+	projects, err := os.ReadDir(projectsDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading projects directory: %v\n", err)
+		return
+	}
+
+	var found bool
+	for _, project := range projects {
+		if project.IsDir() {
+			projectPath := filepath.Join(projectsDir, project.Name())
+
+			// Check in project root tasks
+			taskFile := filepath.Join(projectPath, "tasks", taskID+".yaml")
+			if _, err := os.Stat(taskFile); err == nil {
+				markTaskDone(project.Name(), "", taskID)
+				found = true
+				return
+			}
+
+			// Check in phase tasks
+			phasesPath := filepath.Join(projectPath, "phases")
+			if phases, err := os.ReadDir(phasesPath); err == nil {
+				for _, phase := range phases {
+					if phase.IsDir() {
+						taskFile = filepath.Join(phasesPath, phase.Name(), "tasks", taskID+".yaml")
+						if _, err := os.Stat(taskFile); err == nil {
+							markTaskDone(project.Name(), phase.Name(), taskID)
+							found = true
+							return
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if !found {
+		fmt.Fprintf(os.Stderr, "Error: Task '%s' not found in any project\n", taskID)
+		fmt.Fprintf(os.Stderr, "Use 'dppm list tasks' to see available tasks\n")
+	}
+}
+
+func markTaskDone(projectID, phaseID, taskID string) {
+	var taskPath string
+	if phaseID != "" {
+		taskPath = filepath.Join(projectsPath, "projects", projectID, "phases", phaseID, "tasks", taskID+".yaml")
+	} else {
+		taskPath = filepath.Join(projectsPath, "projects", projectID, "tasks", taskID+".yaml")
+	}
+
+	// Read existing task
+	data, err := os.ReadFile(taskPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading task file: %v\n", err)
+		return
+	}
+
+	var task Task
+	if err := yaml.Unmarshal(data, &task); err != nil {
+		fmt.Fprintf(os.Stderr, "Error parsing task file: %v\n", err)
+		return
+	}
+
+	// Update status and timestamp
+	oldStatus := task.Status
+	task.Status = "done"
+	task.Updated = time.Now().Format("2006-01-02")
+
+	// Write updated task
+	updatedData, err := yaml.Marshal(task)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error marshaling task: %v\n", err)
+		return
+	}
+
+	if err := os.WriteFile(taskPath, updatedData, 0644); err != nil {
+		fmt.Fprintf(os.Stderr, "Error writing task file: %v\n", err)
+		return
+	}
+
+	fmt.Printf("✅ Task '%s' marked as done\n", taskID)
+	fmt.Printf("📁 Project: %s", projectID)
+	if phaseID != "" {
+		fmt.Printf(" → Phase: %s", phaseID)
+	}
+	fmt.Println()
+	if oldStatus != "done" {
+		fmt.Printf("📊 Status: %s → done\n", oldStatus)
+	}
+	fmt.Printf("⏰ Updated: %s\n", time.Now().Format("2006-01-02"))
+}
+
 func init() {
 	createTaskCmd.Flags().StringP("title", "t", "", "Task title")
 	createTaskCmd.Flags().StringP("project", "p", "", "Project ID (required)")
@@ -576,7 +707,11 @@ func init() {
 	updateTaskCmd.Flags().String("due-date", "", "Due date (YYYY-MM-DD)")
 	updateTaskCmd.Flags().Int("story-points", 0, "Story points")
 
+	// Done command flags
+	doneTaskCmd.Flags().StringP("project", "p", "", "Project ID (if not specified, searches all projects)")
+
 	taskCmd.AddCommand(createTaskCmd)
 	taskCmd.AddCommand(showTaskCmd)
 	taskCmd.AddCommand(updateTaskCmd)
+	taskCmd.AddCommand(doneTaskCmd)
 }
