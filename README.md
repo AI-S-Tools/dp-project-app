@@ -13,42 +13,43 @@ A comprehensive CLI tool for managing projects, sprints, and tasks using Dropbox
 
 ## Installation
 
-### Option 1: Homebrew (macOS/Linux)
+### Option 1: One-Shot Installation (Recommended)
 
+#### Linux (x86_64)
 ```bash
-# Add the tap (once)
-brew tap AI-S-Tools/dp-project-app https://github.com/AI-S-Tools/dp-project-app
-
-# Install DPPM
-brew install dppm
-
-# Verify installation
-dppm --version
-dppm wiki "getting started"
+curl -L https://github.com/AI-S-Tools/dppm/releases/download/v1.2.1/dppm-linux-amd64 -o dppm && chmod +x dppm && sudo mv dppm /usr/local/bin/dppm && dppm --version
 ```
 
-### Option 2: One-Line Install (All Platforms)
-
+#### Linux (ARM64)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AI-S-Tools/dp-project-app/master/install.sh | bash
+curl -L https://github.com/AI-S-Tools/dppm/releases/download/v1.2.1/dppm-linux-arm64 -o dppm && chmod +x dppm && sudo mv dppm /usr/local/bin/dppm && dppm --version
 ```
 
-This script automatically:
-- ✅ Detects your platform (Linux, macOS, Windows)
-- ✅ Downloads the appropriate binary
-- ✅ Installs to the correct location
-- ✅ Makes it executable
+#### macOS (Intel)
+```bash
+curl -L https://github.com/AI-S-Tools/dppm/releases/download/v1.2.1/dppm-macos-amd64 -o dppm && chmod +x dppm && sudo mv dppm /usr/local/bin/dppm && dppm --version
+```
 
-### Option 3: Manual Download
+#### macOS (Apple Silicon)
+```bash
+curl -L https://github.com/AI-S-Tools/dppm/releases/download/v1.2.1/dppm-macos-arm64 -o dppm && chmod +x dppm && sudo mv dppm /usr/local/bin/dppm && dppm --version
+```
 
-Download the latest binary for your platform from [Releases](https://github.com/AI-S-Tools/dp-project-app/releases):
+#### Windows (PowerShell as Admin)
+```powershell
+Invoke-WebRequest -Uri "https://github.com/AI-S-Tools/dppm/releases/download/v1.2.1/dppm-windows-amd64.exe" -OutFile "dppm.exe" && Move-Item "dppm.exe" "C:\Windows\System32\dppm.exe" && dppm --version
+```
+
+### Option 2: Manual Download
+
+Download the latest binary for your platform from [Releases](https://github.com/AI-S-Tools/dppm/releases):
 
 #### Linux
 ```bash
 # Download binary (choose your architecture: amd64 or arm64)
-wget https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-amd64
+wget https://github.com/AI-S-Tools/dppm/releases/latest/download/dppm-linux-amd64
 # OR for ARM:
-# wget https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-linux-arm64
+# wget https://github.com/AI-S-Tools/dppm/releases/latest/download/dppm-linux-arm64
 
 # Make executable and install
 chmod +x dppm-linux-amd64
@@ -56,15 +57,14 @@ sudo mv dppm-linux-amd64 /usr/local/bin/dppm
 
 # Verify installation
 dppm --version
-dppm wiki "getting started"
 ```
 
 #### macOS
 ```bash
 # For Intel Macs:
-curl -L -o dppm https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-macos-amd64
+curl -L -o dppm https://github.com/AI-S-Tools/dppm/releases/latest/download/dppm-macos-amd64
 # For Apple Silicon (M1/M2/M3):
-# curl -L -o dppm https://github.com/AI-S-Tools/dp-project-app/releases/latest/download/dppm-macos-arm64
+# curl -L -o dppm https://github.com/AI-S-Tools/dppm/releases/latest/download/dppm-macos-arm64
 
 # Make executable and install
 chmod +x dppm
@@ -72,13 +72,12 @@ sudo mv dppm /usr/local/bin/dppm
 
 # Verify installation
 dppm --version
-dppm wiki "getting started"
 ```
 
 #### Windows
-1. Download `dppm-windows-amd64.exe` from [Releases](https://github.com/AI-S-Tools/dp-project-app/releases)
+1. Download `dppm-windows-amd64.exe` from [Releases](https://github.com/AI-S-Tools/dppm/releases)
 2. Move to a directory in your PATH
-3. Run: `dppm wiki "getting started"`
+3. Run: `dppm --version`
 
 #### Available Platforms
 - **Linux**: amd64, arm64
@@ -88,18 +87,35 @@ dppm wiki "getting started"
 ### Option 3: Build from Source
 
 ```bash
-git clone https://github.com/AI-S-Tools/dp-project-app.git
-cd dp-project-app
+git clone https://github.com/AI-S-Tools/dppm.git
+cd dppm
 go build -o dppm
 sudo cp dppm /usr/local/bin/
 ```
 
+## First Run Setup
+
+DPPM requires Dropbox for project synchronization. On first run:
+
+1. **Automatic Detection**: DPPM will try to find your Dropbox folder automatically
+2. **Multiple Locations**: Supports `~/Dropbox`, `~/Dropbox (Personal)`, `~/Dropbox (Business)`
+3. **Manual Path**: If not found automatically, you'll be prompted to enter the path
+4. **Persistent Config**: Your Dropbox location is saved in `~/.dppm/dropbox.conf`
+
+```bash
+# First run - DPPM will guide you through setup
+dppm --setup
+
+# After setup, normal usage
+dppm project create my-project --name "My Project"
+```
+
 ## Struktur
 
-Projekter gemmes i `~/Dropbox/project-management/` med følgende struktur:
+Projekter gemmes i `[Your Dropbox]/project-management/` med følgende struktur:
 
 ```
-~/Dropbox/project-management/
+[Your Dropbox]/project-management/
 ├── templates/              # YAML templates
 │   ├── project.yaml
 │   ├── sprint.yaml
