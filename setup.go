@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // FirstRunSetup handles initial DPPM setup with AI guidance
@@ -25,12 +27,33 @@ type SetupStep struct {
 
 // validateDropboxInstallation checks if Dropbox is properly installed and configured
 func validateDropboxInstallation() (*FirstRunSetup, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get home directory: %v", err)
+	var dropboxPath string
+	var found bool
+
+	// First, try to load saved Dropbox path
+	savedPath := loadDropboxPath()
+	if savedPath != "" && isValidDropboxPath(savedPath) {
+		dropboxPath = savedPath
+		found = true
+	} else {
+		// Try common Dropbox locations
+		possiblePaths := getDropboxPaths()
+		for _, path := range possiblePaths {
+			if isValidDropboxPath(path) {
+				dropboxPath = path
+				found = true
+				// Save the found path for future use
+				saveDropboxPath(path)
+				break
+			}
+		}
 	}
 
-	dropboxPath := filepath.Join(home, "Dropbox")
+	// If still not found, we'll prompt during setup
+	if !found {
+		dropboxPath = "" // Will be prompted for
+	}
+
 	setup := &FirstRunSetup{
 		DropboxPath: dropboxPath,
 		Steps: []SetupStep{
@@ -74,11 +97,12 @@ func validateDropboxInstallation() (*FirstRunSetup, error) {
 				Required:    true,
 				Instructions: `📁 DROPBOX FOLDER VALIDATION:
 
-   Check ~/Dropbox/ exists and syncs:
+   Verify your Dropbox folder exists and syncs:
    • Folder should contain existing Dropbox files
-   • Create test file: echo "test" > ~/Dropbox/dppm-test.txt
+   • Create test file to verify sync works
    • File should appear on dropbox.com within minutes
-   • Delete test file after verification`,
+   • Delete test file after verification
+   • If Dropbox is in non-standard location, DPPM will prompt for path`,
 			},
 			{
 				ID:          "create-project-structure",
@@ -87,13 +111,14 @@ func validateDropboxInstallation() (*FirstRunSetup, error) {
 				Required:    true,
 				Instructions: `🏗️ PROJECT STRUCTURE CREATION:
 
-   DPPM will create:
-   ~/Dropbox/project-management/
+   DPPM will create in your Dropbox folder:
+   project-management/
    ├── projects/          # Individual project folders
    ├── templates/         # Project templates
    └── dppm-global.db     # Global database
 
-   This ensures consistent structure across all devices.`,
+   This ensures consistent structure across all devices.
+   Path will be adapted to your specific Dropbox location.`,
 			},
 			{
 				ID:          "verify-permissions",
@@ -103,9 +128,10 @@ func validateDropboxInstallation() (*FirstRunSetup, error) {
 				Instructions: `🔐 PERMISSIONS CHECK:
 
    DPPM needs read/write access to:
-   • ~/Dropbox/project-management/ (create folders/files)
+   • Your Dropbox/project-management/ folder
    • Database operations (SQLite files)
-   • YAML file operations (project data)`,
+   • YAML file operations (project data)
+   • Automatic permission validation included`,
 			},
 		},
 	}
@@ -290,6 +316,18 @@ Follow this guide step-by-step to ensure correct configuration.
 		return fmt.Errorf("setup validation failed: %v", err)
 	}
 
+	// If Dropbox path is not found, prompt for it
+	if setup.DropboxPath == "" {
+		fmt.Println("\n⚠️  Dropbox folder not found automatically.")
+		path, err := promptForDropboxPath()
+		if err != nil {
+			return fmt.Errorf("failed to get Dropbox path: %v", err)
+		}
+		setup.DropboxPath = path
+		// Re-validate with the new path
+		setup.validateSteps()
+	}
+
 	// Show each setup step
 	for _, step := range setup.Steps {
 		status := "❌ INCOMPLETE"
@@ -337,8 +375,8 @@ REQUIRED ACTIONS:
 ======================
 
 ✅ Dropbox installed and running
-✅ Project structure created:
-   ~/Dropbox/project-management/
+✅ Project structure created in your Dropbox:
+   project-management/
    ├── projects/          # Your project folders
    ├── templates/         # Project templates
    └── dppm-global.db     # Global database
@@ -352,6 +390,107 @@ REQUIRED ACTIONS:
 `)
 
 	return nil
+}
+
+// getDropboxConfigPath returns path to DPPM config file for storing Dropbox location
+func getDropboxConfigPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	configDir := filepath.Join(home, ".dppm")
+	os.MkdirAll(configDir, 0755)
+	return filepath.Join(configDir, "dropbox.conf"), nil
+}
+
+// saveDropboxPath saves the Dropbox path to config file
+func saveDropboxPath(path string) error {
+	configPath, err := getDropboxConfigPath()
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(configPath, []byte(path), 0644)
+}
+
+// loadDropboxPath loads the saved Dropbox path from config file
+func loadDropboxPath() string {
+	configPath, err := getDropboxConfigPath()
+	if err != nil {
+		return ""
+	}
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return ""
+	}
+
+	return strings.TrimSpace(string(data))
+}
+
+// getDropboxPaths returns common Dropbox installation paths
+func getDropboxPaths() []string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return []string{}
+	}
+
+	return []string{
+		filepath.Join(home, "Dropbox"),
+		filepath.Join(home, "Dropbox (Personal)"),
+		filepath.Join(home, "Dropbox (Business)"),
+		"/Users/" + filepath.Base(home) + "/Dropbox",
+		"/Users/" + filepath.Base(home) + "/Dropbox (Personal)",
+		"/Users/" + filepath.Base(home) + "/Dropbox (Business)",
+	}
+}
+
+// isValidDropboxPath checks if a path is a valid Dropbox installation
+func isValidDropboxPath(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+
+	// Check for Dropbox indicators
+	indicators := []string{".dropbox", ".dropbox.cache"}
+	for _, indicator := range indicators {
+		indicatorPath := filepath.Join(path, indicator)
+		if _, err := os.Stat(indicatorPath); err == nil {
+			return true
+		}
+	}
+
+	return false
+}
+
+// promptForDropboxPath asks user to input Dropbox path
+func promptForDropboxPath() (string, error) {
+	fmt.Print("\n🔍 DROPBOX PATH REQUIRED\n")
+	fmt.Print("========================\n\n")
+	fmt.Print("DPPM could not automatically find your Dropbox folder.\n")
+	fmt.Print("Please enter the full path to your Dropbox folder: ")
+
+	scanner := bufio.NewScanner(os.Stdin)
+	if !scanner.Scan() {
+		return "", fmt.Errorf("failed to read input")
+	}
+
+	path := strings.TrimSpace(scanner.Text())
+	if path == "" {
+		return "", fmt.Errorf("no path provided")
+	}
+
+	// Validate the provided path
+	if !isValidDropboxPath(path) {
+		return "", fmt.Errorf("invalid Dropbox path: %s (missing .dropbox indicators)", path)
+	}
+
+	// Save for future use
+	if err := saveDropboxPath(path); err != nil {
+		fmt.Printf("Warning: Could not save Dropbox path: %v\n", err)
+	}
+
+	return path, nil
 }
 
 // requireDropboxSetup enforces setup completion before allowing commands
