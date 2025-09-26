@@ -40,6 +40,7 @@ Storage Location: ~/Dropbox/project-management/
   dppm task create init --project my-project --phase setup
 
 📖 Getting Help:
+  dppm --setup                        # First-time setup guide (REQUIRED)
   dppm wiki list                      # All available topics
   dppm wiki "complete"                # Complete workflow example
   dppm --help                         # Command reference
@@ -82,19 +83,24 @@ func init() {
 	// Add --wiki flag for direct search
 	rootCmd.Flags().String("wiki", "", "Search DPPM knowledge base (e.g. --wiki \"create task\")")
 
-	// Add version flag
+	// Add version and setup flags
 	rootCmd.Flags().BoolP("version", "v", false, "Show version information")
+	rootCmd.Flags().Bool("setup", false, "Run first-time setup guide (REQUIRED on fresh install)")
 }
 
 func main() {
-	// Initialize ERD database for "hegn på begge sider" validation
-	if err := initDatabase(); err != nil {
-		fmt.Fprintf(os.Stderr, "Database initialization failed: %v\n", err)
-		os.Exit(1)
+	// Check for setup flag first (before database init)
+	for _, arg := range os.Args {
+		if arg == "--setup" {
+			if err := showFirstRunGuide(); err != nil {
+				fmt.Fprintf(os.Stderr, "Setup failed: %v\n", err)
+				os.Exit(1)
+			}
+			return
+		}
 	}
-	defer closeDatabase()
 
-	// Check for version flag first
+	// Check for version flag
 	for _, arg := range os.Args {
 		if arg == "--version" || arg == "-v" {
 			fmt.Printf("DPPM (Dropbox Project Manager) %s\n", version)
@@ -103,6 +109,19 @@ func main() {
 			return
 		}
 	}
+
+	// CRITICAL: Require Dropbox setup before any database operations
+	if err := requireDropboxSetup(); err != nil {
+		fmt.Fprintf(os.Stderr, "❌ %v\n", err)
+		os.Exit(1)
+	}
+
+	// Initialize ERD database ONLY after Dropbox validation
+	if err := initDatabase(); err != nil {
+		fmt.Fprintf(os.Stderr, "Database initialization failed: %v\n", err)
+		os.Exit(1)
+	}
+	defer closeDatabase()
 
 	// Check for --wiki flag in args before executing
 	for i, arg := range os.Args {
