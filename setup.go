@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // FirstRunSetup handles initial DPPM setup with AI guidance
@@ -376,4 +375,4 @@ func requireDropboxSetup() error {
 	}
 
 	return nil
-}`
+}
