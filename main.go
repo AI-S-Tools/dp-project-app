@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -68,8 +67,8 @@ For detailed command help, use: dppm [command] --help`,
 var projectsPath string
 
 func init() {
-	home, _ := os.UserHomeDir()
-	projectsPath = filepath.Join(home, "Dropbox", "project-management")
+	// Don't set a default projectsPath - will be set after Dropbox validation
+	// This prevents creating fake Dropbox directories
 
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(projectCmd)

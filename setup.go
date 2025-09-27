@@ -49,9 +49,14 @@ func validateDropboxInstallation() (*FirstRunSetup, error) {
 		}
 	}
 
-	// If still not found, we'll prompt during setup
+	// If still not found, don't set a default - require explicit setup
 	if !found {
-		dropboxPath = "" // Will be prompted for
+		dropboxPath = "" // Must run setup to configure
+	}
+
+	// Don't allow defaulting to ~/Dropbox if it's not valid
+	if dropboxPath != "" && !isValidDropboxPath(dropboxPath) {
+		dropboxPath = "" // Reset invalid path
 	}
 
 	setup := &FirstRunSetup{
@@ -249,6 +254,22 @@ func (s *FirstRunSetup) hasPermissions() bool {
 
 // createProjectStructure initializes the DPPM folder hierarchy
 func (s *FirstRunSetup) createProjectStructure() error {
+	// CRITICAL: Prevent creating fake Dropbox directory
+	if s.DropboxPath == "" {
+		return fmt.Errorf("Dropbox path not configured - run 'dppm --setup' first")
+	}
+
+	// Verify this is a real Dropbox directory
+	if !isValidDropboxPath(s.DropboxPath) {
+		return fmt.Errorf("'%s' is not a valid Dropbox directory\n\n"+
+			"❌ DROPBOX NOT FOUND\n"+
+			"DPPM requires Dropbox for synchronization.\n\n"+
+			"Please:\n"+
+			"1. Install Dropbox desktop app\n"+
+			"2. Sign in and complete sync\n"+
+			"3. Run 'dppm --setup' to configure\n", s.DropboxPath)
+	}
+
 	requiredDirs := []string{
 		"project-management",
 		"project-management/projects",
@@ -504,6 +525,13 @@ func requireDropboxSetup() error {
 		fmt.Println("🚫 DPPM SETUP REQUIRED")
 		fmt.Println("Run: dppm --setup for first-time configuration")
 		return fmt.Errorf("DPPM setup incomplete")
+	}
+
+	// Set the global projectsPath after validation
+	if setup.DropboxPath != "" {
+		projectsPath = filepath.Join(setup.DropboxPath, "project-management")
+	} else {
+		return fmt.Errorf("Dropbox path not configured - run 'dppm --setup' first")
 	}
 
 	// Ensure project structure exists
