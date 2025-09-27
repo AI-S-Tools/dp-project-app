@@ -84,4 +84,4 @@ dppm task update milestone-dependencies --status done
 4. **AI Context**: AI agents understand project goals and progress
 5. **Timeline Management**: Target dates help with project planning
 
-This demonstrates hvorfor milestone systemet ville være værdifuldt for DPPM projekter.
+This demonstrates why the milestone system would be valuable for DPPM projects.

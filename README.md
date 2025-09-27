@@ -112,7 +112,7 @@ dppm project create my-project --name "My Project"
 
 ## Struktur
 
-Projekter gemmes i `[Your Dropbox]/project-management/` med følgende struktur:
+Projects are stored in `[Your Dropbox]/project-management/` with the following structure:
 
 ```
 [Your Dropbox]/project-management/
@@ -134,27 +134,27 @@ Projekter gemmes i `[Your Dropbox]/project-management/` med følgende struktur:
 
 ## Kommandoer
 
-### Projekter
+### Projects
 
 ```bash
-# Opret nyt projekt
-dppm project create my-project --name "Mit Projekt" --description "Beskrivelse" --owner "username"
+# Create new project
+dppm project create my-project --name "My Project" --description "Description" --owner "username"
 
-# List alle projekter
+# List all projects
 dppm list projects
 ```
 
-### Sprints (kommer snart)
+### Sprints (coming soon)
 
 ```bash
 dppm sprint create sprint-1 --project my-project
 dppm sprint list --project my-project
 ```
 
-### Tasks (kommer snart)
+### Tasks (coming soon)
 
 ```bash
-dppm task create task-1 --project my-project --sprint sprint-1 --title "Min task"
+dppm task create task-1 --project my-project --sprint sprint-1 --title "My task"
 dppm task list --project my-project
 dppm task update task-1 --status in_progress
 ```
@@ -199,28 +199,28 @@ project_id: "parent-project-id"
 status: "planning"  # planning, active, completed, cancelled
 start_date: "2025-09-23"
 end_date: "2025-10-07"
-goal: "Sprint mål"
+goal: "Sprint goal"
 ```
 
 ### Task
 ```yaml
 id: "task-id"
-title: "Task titel"
+title: "Task title"
 project_id: "parent-project-id"
 sprint_id: "parent-sprint-id"
 status: "todo"  # todo, in_progress, review, blocked, done
 priority: "medium"  # low, medium, high, critical
 assignee: "username"
 description: |
-  Detaljeret task beskrivelse
+  Detailed task description
 ```
 
 ## Udvikling
 
-Appen er bygget i Go med:
-- `github.com/spf13/cobra` til CLI commands
-- `gopkg.in/yaml.v3` til YAML parsing
-- Standard library til filhåndtering
+The app is built in Go with:
+- `github.com/spf13/cobra` for CLI commands
+- `gopkg.in/yaml.v3` for YAML parsing
+- Standard library for file handling
 
 ## Advanced Task Management Features
 

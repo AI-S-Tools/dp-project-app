@@ -1,6 +1,6 @@
 # Milestones Extension - AI Collaboration Plan
 
-Dette dokument bruger DPPM's AI collaboration system til at koordinere implementeringen af milestones extension.
+This document uses DPPM's AI collaboration system to coordinate the implementation of the milestones extension.
 
 ## Implementation Roadmap
 
