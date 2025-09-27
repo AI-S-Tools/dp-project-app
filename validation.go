@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -75,23 +76,73 @@ func ValidateProjectID(id string) error {
 	return nil
 }
 
-// ValidatePhaseID validates a phase ID (similar rules to project ID)
+// ValidatePhaseID validates a phase ID must follow P1, P2, P3 format (with optional suffix)
 func ValidatePhaseID(id string) error {
-	// Phase IDs follow same rules as project IDs
-	if err := ValidateProjectID(id); err != nil {
-		// Adjust error message for phase context
-		return fmt.Errorf("phase ID validation failed: %w", err)
+	// Check empty
+	if id == "" {
+		return fmt.Errorf("phase ID cannot be empty")
 	}
+
+	// Phase must start with P followed by a number
+	// Valid formats: P1, P2, P1-backend, P2-frontend, etc.
+	phaseRegex := regexp.MustCompile(`^P[1-9][0-9]*(-[a-zA-Z0-9][a-zA-Z0-9-_]*)?$`)
+	if !phaseRegex.MatchString(id) {
+		return fmt.Errorf("phase ID must follow format: P1, P2, P3... (optionally with suffix like P1-backend)")
+	}
+
+	// Check for dangerous characters (additional safety)
+	if strings.Contains(id, "/") || strings.Contains(id, "\\") ||
+	   strings.Contains(id, "..") || strings.Contains(id, "~") {
+		return fmt.Errorf("phase ID contains invalid path characters")
+	}
+
 	return nil
 }
 
-// ValidateTaskID validates a task ID
-func ValidateTaskID(id string) error {
-	// Task IDs follow same rules as project IDs
-	if err := ValidateProjectID(id); err != nil {
-		// Adjust error message for task context
-		return fmt.Errorf("task ID validation failed: %w", err)
+// ValidateTaskID validates task ID format: T1.1, T2.1, subtasks T1.1.1, bugs T1.1.B1
+func ValidateTaskID(id string, phaseID string) error {
+	// Check empty
+	if id == "" {
+		return fmt.Errorf("task ID cannot be empty")
 	}
+
+	// Extract phase number from phase ID (e.g., P1 -> 1, P2-backend -> 2)
+	var phaseNum int
+	if n, err := fmt.Sscanf(phaseID, "P%d", &phaseNum); n != 1 || err != nil {
+		// If phase ID is empty or invalid, allow any valid task format
+		// This happens when validating without phase context
+		if phaseID != "" {
+			return fmt.Errorf("invalid phase ID format: %s", phaseID)
+		}
+		// Allow validation without phase context - just check format
+		phaseNum = -1
+	}
+
+	// Task formats:
+	// T1.1, T1.2 (regular tasks)
+	// T1.1-auth, T1.2-login (with suffix)
+	// T1.1.1, T1.1.2 (subtasks)
+	// T1.1.B1, T1.1.B2 (bugs)
+	taskRegex := regexp.MustCompile(`^T([1-9][0-9]*)\.([1-9][0-9]*)(\.[1-9][0-9]*|\.B[1-9][0-9]*)?(-[a-zA-Z0-9][a-zA-Z0-9-_]*)?$`)
+	matches := taskRegex.FindStringSubmatch(id)
+	if matches == nil {
+		return fmt.Errorf("task ID must follow format: T1.1, T1.2 (subtasks: T1.1.1, bugs: T1.1.B1, with suffix: T1.1-auth)")
+	}
+
+	// If we have a phase context, validate the task belongs to that phase
+	if phaseNum > 0 {
+		taskPhaseNum, _ := strconv.Atoi(matches[1])
+		if taskPhaseNum != phaseNum {
+			return fmt.Errorf("task %s does not belong to phase %s (should start with T%d.)", id, phaseID, phaseNum)
+		}
+	}
+
+	// Check for dangerous characters (additional safety)
+	if strings.Contains(id, "/") || strings.Contains(id, "\\") ||
+	   strings.Contains(id, "..") || strings.Contains(id, "~") {
+		return fmt.Errorf("task ID contains invalid path characters")
+	}
+
 	return nil
 }
 

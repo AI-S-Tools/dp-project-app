@@ -110,7 +110,7 @@ dppm --setup
 dppm project create my-project --name "My Project"
 ```
 
-## Struktur
+## Structure
 
 Projects are stored in `[Your Dropbox]/project-management/` with the following structure:
 
@@ -123,16 +123,39 @@ Projects are stored in `[Your Dropbox]/project-management/` with the following s
 └── projects/
     └── project-id/
         ├── project.yaml     # Project metadata
-        └── sprints/
-            └── sprint-id/
-                ├── sprint.yaml
+        └── phases/         # Phase directories (P1, P2, P3...)
+            └── P1/         # Phase 1
+                ├── phase.yaml
                 └── tasks/
-                    ├── task-1.yaml
-                    ├── task-2.yaml
-                    └── ...
+                    ├── T1.1.yaml     # Task in phase 1
+                    ├── T1.2.yaml     # Second task in phase 1
+                    ├── T1.1.1.yaml   # Subtask
+                    └── T1.1.B1.yaml  # Bug
 ```
 
-## Kommandoer
+## Structured Numbering System
+
+DPPM enforces a hierarchical numbering system for phases and tasks:
+
+### Phase Numbering
+- **Format**: P1, P2, P3... (with optional suffix like P1-backend)
+- **Required**: Phases must exist in the project directory
+- **Examples**: `P1`, `P2-frontend`, `P3-testing`
+
+### Task Numbering
+- **Format**: T{phase}.{task} (e.g., T1.1, T2.3)
+- **Rule**: Task number must match phase (T1.* in P1, T2.* in P2)
+- **Subtasks**: T1.1.1, T1.1.2 (third level numbering)
+- **Bugs**: T1.1.B1, T1.1.B2 (B prefix for bugs)
+- **Suffixes**: T1.1-auth, T2.3-api (descriptive suffixes allowed)
+
+### Validation
+- Tasks require a phase (no orphan tasks)
+- Phase must exist before creating tasks
+- Task numbers must match their phase number
+- Project must exist before creating phases
+
+## Commands
 
 ### Projects
 
@@ -144,19 +167,27 @@ dppm project create my-project --name "My Project" --description "Description" -
 dppm list projects
 ```
 
-### Sprints (coming soon)
+### Phases (Sprints)
 
 ```bash
-dppm sprint create sprint-1 --project my-project
-dppm sprint list --project my-project
+# Phases must follow P1, P2, P3... format
+dppm phase create P1 --project my-project --name "Phase 1" --goal "Complete backend"
+dppm phase create P2-frontend --project my-project --name "Frontend Phase"
 ```
 
-### Tasks (coming soon)
+### Tasks
 
 ```bash
-dppm task create task-1 --project my-project --sprint sprint-1 --title "My task"
+# Tasks must follow T{phase}.{number} format and match their phase
+# T1.* tasks go in P1, T2.* tasks go in P2, etc.
+dppm task create T1.1 --project my-project --phase P1 --title "First task"
+dppm task create T1.2-auth --project my-project --phase P1 --title "Auth task"
+
+# Subtasks and bugs
+dppm task create T1.1.1 --project my-project --phase P1 --title "Subtask"
+dppm task create T1.1.B1 --project my-project --phase P1 --title "Bug fix"
 dppm task list --project my-project
-dppm task update task-1 --status in_progress
+dppm task update T1.1 --status in_progress
 ```
 
 ## Comprehensive Help System

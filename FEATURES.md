@@ -2,10 +2,35 @@
 
 Complete feature list and command reference for DPPM - Dropbox Project Manager.
 
+## 📐 Structured Numbering System
+
+DPPM enforces a strict hierarchical numbering convention for optimal organization:
+
+### Phase Numbering
+- **Format**: `P{number}[-suffix]` (e.g., P1, P2-backend, P3)
+- **Required**: All phases must follow this format
+- **Validation**: Enforced at creation time
+
+### Task Numbering
+- **Format**: `T{phase}.{task}[-suffix]` (e.g., T1.1, T2.3-api)
+- **Hierarchy**:
+  - Main tasks: `T1.1`, `T1.2` (in phase P1)
+  - Subtasks: `T1.1.1`, `T1.1.2`
+  - Bugs: `T1.1.B1`, `T1.1.B2`
+- **Rule**: Task prefix MUST match phase (T1.* only in P1, T2.* only in P2)
+- **Required**: Phase must be specified for all tasks
+
+### Validation Rules
+- ✅ Project must exist before phases
+- ✅ Phase must exist before tasks
+- ✅ Task numbers must match their phase
+- ✅ No orphan tasks outside phases
+- ✅ Strict format validation
+
 ## 🎯 Core Features
 
 ### ✅ Project Management
-- **Hierarchical Organization**: Projects → Phases → Tasks → Components → Issues
+- **Hierarchical Organization**: Projects → Phases (P1, P2) → Tasks (T1.1, T2.1) → Components → Issues
 - **YAML-based Storage**: Human-readable, version-controllable project data
 - **Dropbox Synchronization**: Cross-platform team collaboration via Dropbox
 - **Template System**: Consistent project structure with embedded templates
@@ -148,8 +173,8 @@ dppm status projects
 
 #### Phase Creation & Management
 ```bash
-# Create new phase
-dppm phase create PHASE_ID \
+# Create new phase (must follow P1, P2, P3... format)
+dppm phase create P1 \
   --project PROJECT_ID \
   --name "Phase Name" \
   --description "Phase description" \
@@ -178,12 +203,22 @@ dppm status phases --project PROJECT_ID
 
 ### Task Commands
 
+#### Structured Task Numbering
+Tasks follow a strict numbering format:
+- **T{phase}.{number}**: Main tasks (T1.1, T2.3)
+- **T{phase}.{number}.{sub}**: Subtasks (T1.1.1, T1.1.2)
+- **T{phase}.{number}.B{bug}**: Bugs (T1.1.B1, T1.1.B2)
+- **Suffixes**: Optional descriptive suffixes (T1.1-auth, T2.3-api)
+- **Phase matching**: T1.* tasks must be in P1, T2.* in P2, etc.
+
+### Task Commands
+
 #### Task Creation & Management
 ```bash
 # Create new task
-dppm task create TASK_ID \
+dppm task create T1.1 \
   --project PROJECT_ID \
-  --phase PHASE_ID \
+  --phase P1 \
   --title "Task Title" \
   --description "Task description" \
   --assignee "username" \

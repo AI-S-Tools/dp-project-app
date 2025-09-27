@@ -145,15 +145,15 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		taskID := args[0]
 
-		// Validate task ID for security
-		if err := ValidateTaskID(taskID); err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			os.Exit(1)
-		}
-
 		title, _ := cmd.Flags().GetString("title")
 		projectID, _ := cmd.Flags().GetString("project")
 		phaseID, _ := cmd.Flags().GetString("phase")
+
+		// Validate task ID for security (with phase context if available)
+		if err := ValidateTaskID(taskID, phaseID); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
 		description, _ := cmd.Flags().GetString("description")
 		priority, _ := cmd.Flags().GetString("priority")
 		assignee, _ := cmd.Flags().GetString("assignee")
@@ -180,6 +180,22 @@ Examples:
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				os.Exit(1)
 			}
+		}
+
+		// Check if project exists
+		projectPath := filepath.Join(projectsPath, "projects", projectID)
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "Error: Project '%s' does not exist\n", projectID)
+			fmt.Fprintf(os.Stderr, "Create it first with: dppm project create %s\n", projectID)
+			os.Exit(1)
+		}
+
+		// Check if phase exists within the project
+		phasePath := filepath.Join(projectsPath, "projects", projectID, "phases", phaseID)
+		if _, err := os.Stat(phasePath); os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "Error: Phase '%s' does not exist in project '%s'\n", phaseID, projectID)
+			fmt.Fprintf(os.Stderr, "Create it first with: dppm phase create %s --project %s\n", phaseID, projectID)
+			os.Exit(1)
 		}
 
 		if title == "" {
@@ -600,12 +616,13 @@ func updateTaskFile(taskFile string, cmd *cobra.Command) bool {
 func init() {
 	createTaskCmd.Flags().StringP("title", "t", "", "Task title")
 	createTaskCmd.Flags().StringP("project", "p", "", "Project ID (required)")
-	createTaskCmd.Flags().StringP("phase", "s", "", "Phase ID (optional)")
+	createTaskCmd.Flags().StringP("phase", "s", "", "Phase ID (required)")
 	createTaskCmd.Flags().StringP("description", "d", "", "Task description")
 	createTaskCmd.Flags().String("priority", "medium", "Task priority (low, medium, high, critical)")
 	createTaskCmd.Flags().StringP("assignee", "a", "", "Task assignee")
 
 	createTaskCmd.MarkFlagRequired("project")
+	createTaskCmd.MarkFlagRequired("phase")
 
 	// Show command flags
 	showTaskCmd.Flags().StringP("project", "p", "", "Project ID (if not specified, searches all projects)")

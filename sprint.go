@@ -110,6 +110,14 @@ Examples:
 			os.Exit(1)
 		}
 
+		// Check if project exists
+		projectPath := filepath.Join(projectsPath, "projects", projectID)
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "Error: Project '%s' does not exist\n", projectID)
+			fmt.Fprintf(os.Stderr, "Create it first with: dppm project create %s\n", projectID)
+			os.Exit(1)
+		}
+
 		if name == "" {
 			name = phaseID
 		}
