@@ -1,18 +1,37 @@
 package main
 
-import (
-	"database/sql"
-	"fmt"
-	"os"
-	"path/filepath"
+// Database functionality temporarily disabled to avoid CGO dependency
+// Uncomment and refactor if ERD features are needed in the future
 
-	_ "github.com/mattn/go-sqlite3"
-)
+// var db *sql.DB
 
-var db *sql.DB
-
-// initDatabase initializes the SQLite database with ERD schema
+// initDatabase - stub function, database disabled to avoid CGO dependency
 func initDatabase() error {
+	// Database functionality disabled - DPPM uses YAML file storage
+	return nil
+}
+
+// closeDatabase - stub function, database disabled
+func closeDatabase() error {
+	return nil
+}
+
+// Stub implementations for database-related functions used in task.go
+func getAIGuidance() ([]map[string]string, error) {
+	// Return empty guidance - database disabled
+	return []map[string]string{}, nil
+}
+
+func getSuggestedTaskIDs() ([]string, error) {
+	// Return empty suggestions - database disabled
+	return []string{}, nil
+}
+
+// Original database code preserved below for future reference
+
+/*
+// Original initDatabase implementation
+func initDatabaseOriginal() error {
 	// Check if we're in a bound project directory
 	context, err := getLocalProjectContext()
 	if err != nil || context == nil {
@@ -391,4 +410,4 @@ func closeDatabase() error {
 		return db.Close()
 	}
 	return nil
-}
+}*/

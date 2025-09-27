@@ -116,12 +116,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Initialize ERD database ONLY after Dropbox validation
-	if err := initDatabase(); err != nil {
-		fmt.Fprintf(os.Stderr, "Database initialization failed: %v\n", err)
-		os.Exit(1)
-	}
-	defer closeDatabase()
+	// Database functionality temporarily disabled to avoid CGO dependency
+	// TODO: Consider alternative storage if ERD features needed
+	// if err := initDatabase(); err != nil {
+	//	fmt.Fprintf(os.Stderr, "Database initialization failed: %v\n", err)
+	//	os.Exit(1)
+	// }
+	// defer closeDatabase()
 
 	// Check for --wiki flag in args before executing
 	for i, arg := range os.Args {

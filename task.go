@@ -129,8 +129,9 @@ tracked with issues and dependencies.
 
 Arguments:
   task-id    Unique identifier for the task (required)
-             Must be lowercase, alphanumeric with hyphens allowed
-             Examples: auth-system, file-browser, ui-enhancement
+             Accepts any valid identifier with letters, numbers, hyphens, underscores, and dots
+             Examples: auth-system, file-browser, T1.1, bug-login, implement_feature
+             Note: IDs starting with 'bug-' are treated as bug reports
 
 Examples:
   dppm task create auth-system --project dash-lxd --title "User Authentication System" --description "Implement JWT-based authentication with login/logout functionality"
