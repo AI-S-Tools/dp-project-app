@@ -98,6 +98,18 @@ Examples:
 		startDate, _ := cmd.Flags().GetString("start-date")
 		endDate, _ := cmd.Flags().GetString("end-date")
 
+		// Validate phase ID for security
+		if err := ValidatePhaseID(phaseID); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Validate project ID
+		if err := ValidateProjectID(projectID); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: Invalid project ID: %v\n", err)
+			os.Exit(1)
+		}
+
 		if name == "" {
 			name = phaseID
 		}

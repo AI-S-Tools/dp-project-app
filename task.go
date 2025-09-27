@@ -144,25 +144,10 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		taskID := args[0]
 
-		// 🚧 VENSTRE HEGN: ERD Validation
-		if err := validateTaskID(taskID); err != nil {
-			fmt.Printf("❌ VENSTRE HEGN: %s\n\n", err.Error())
-
-			// 🎯 HØJRE HEGN: Show correct alternatives
-			fmt.Println("✅ HØJRE HEGN - CORRECT FORMAT:")
-			fmt.Printf("  Task IDs must be T{phase}.{number} or bug-{description}\n")
-			fmt.Printf("  Examples: T1.1, T2.3, bug-login-error\n\n")
-
-			fmt.Println("💡 SUGGESTED COMMANDS:")
-			if suggestions, err := getSuggestedTaskIDs(); err == nil {
-				for _, suggestion := range suggestions {
-					fmt.Printf("  dppm task create %s --title \"Your Task Title\"\n", suggestion)
-				}
-			} else {
-				fmt.Printf("  dppm phase create P1 --name \"Foundation\"  # Create phase first\n")
-				fmt.Printf("  dppm task create T1.1 --title \"Your Task Title\"\n")
-			}
-			return
+		// Validate task ID for security
+		if err := ValidateTaskID(taskID); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
 		}
 
 		title, _ := cmd.Flags().GetString("title")
@@ -171,6 +156,30 @@ Examples:
 		description, _ := cmd.Flags().GetString("description")
 		priority, _ := cmd.Flags().GetString("priority")
 		assignee, _ := cmd.Flags().GetString("assignee")
+
+		// Validate project ID if specified
+		if projectID != "" {
+			if err := ValidateProjectID(projectID); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: Invalid project ID: %v\n", err)
+				os.Exit(1)
+			}
+		}
+
+		// Validate phase ID if specified
+		if phaseID != "" {
+			if err := ValidatePhaseID(phaseID); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: Invalid phase ID: %v\n", err)
+				os.Exit(1)
+			}
+		}
+
+		// Validate description if provided
+		if description != "" {
+			if err := ValidateDescription(description); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+		}
 
 		if title == "" {
 			title = taskID

@@ -97,6 +97,31 @@ AI Usage Tips:
 		description, _ := cmd.Flags().GetString("description")
 		owner, _ := cmd.Flags().GetString("owner")
 
+		// Validate project ID for security
+		if err := ValidateProjectID(projectID); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Check if project already exists
+		exists, err := CheckProjectExists(projectID)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error checking project existence: %v\n", err)
+			os.Exit(1)
+		}
+		if exists {
+			fmt.Fprintf(os.Stderr, "Error: Project '%s' already exists\n", projectID)
+			os.Exit(1)
+		}
+
+		// Validate description if provided
+		if description != "" {
+			if err := ValidateDescription(description); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+		}
+
 		if name == "" {
 			name = projectID
 		}
